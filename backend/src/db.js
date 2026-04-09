@@ -28,11 +28,24 @@ async function init() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       location TEXT NOT NULL,
-      country TEXT NOT NULL,
+      country TEXT NOT NULL DEFAULT 'Latvija',
       website TEXT,
       description TEXT,
       ranking INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'user',
+      expert_university_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (expert_university_id) REFERENCES universities(id) ON DELETE SET NULL
     );
   `);
 
@@ -44,57 +57,225 @@ async function init() {
       degree TEXT NOT NULL,
       duration_years REAL NOT NULL,
       tuition_per_year REAL,
-      language TEXT DEFAULT 'English',
+      language TEXT DEFAULT 'Latviešu',
       description TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (university_id) REFERENCES universities(id) ON DELETE CASCADE
     );
   `);
 
-  // Seed sample data if empty
+  // Seed Latvian universities if empty
   const [{ values }] = db.exec('SELECT COUNT(*) as count FROM universities');
   if (values[0][0] === 0) {
-    const insUni = (name, location, country, website, description, ranking) => {
+    const ins = (name, location, website, description, ranking) => {
       db.run(
         'INSERT INTO universities (name, location, country, website, description, ranking) VALUES (?,?,?,?,?,?)',
-        [name, location, country, website, description, ranking]
+        [name, location, 'Latvija', website, description, ranking]
       );
       return db.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
     };
-    const insProg = (uniId, name, degree, duration_years, tuition_per_year, language) => {
+    const prog = (uniId, name, degree, years, tuition, lang = 'Latviešu') => {
       db.run(
         'INSERT INTO programs (university_id, name, degree, duration_years, tuition_per_year, language) VALUES (?,?,?,?,?,?)',
-        [uniId, name, degree, duration_years, tuition_per_year, language]
+        [uniId, name, degree, years, tuition || null, lang]
       );
     };
 
-    const u1 = insUni('MIT', 'Cambridge, MA', 'USA', 'https://mit.edu', 'Massachusetts Institute of Technology', 1);
-    const u2 = insUni('University of Oxford', 'Oxford', 'UK', 'https://ox.ac.uk', 'One of the oldest universities in the world', 2);
-    const u3 = insUni('ETH Zurich', 'Zurich', 'Switzerland', 'https://ethz.ch', 'Swiss Federal Institute of Technology', 7);
+    const lu = ins(
+      'Latvijas Universitāte',
+      'Rīga',
+      'https://www.lu.lv',
+      'Latvijas lielākā un vecākā augstskola, dibināta 1919. gadā. Piedāvā plašu studiju programmu klāstu dabaszinātnēs, humanitārajās zinātnēs, sociālajās zinātnēs un medicīnā.',
+      1
+    );
+    prog(lu, 'Datorzinātne', 'BSc', 3, 2200);
+    prog(lu, 'Tiesību zinātne', 'BSc', 4, 2000);
+    prog(lu, 'Ekonomika', 'BSc', 3, 2000);
+    prog(lu, 'Medicīna', 'MD', 6, 4000);
+    prog(lu, 'Fizikas', 'BSc', 3, 1800);
 
-    insProg(u1, 'Computer Science', 'BSc', 4, 57590, 'English');
-    insProg(u1, 'Electrical Engineering', 'BSc', 4, 57590, 'English');
-    insProg(u2, 'Computer Science', 'BA', 3, 9250, 'English');
-    insProg(u2, 'Mathematics', 'BA', 3, 9250, 'English');
-    insProg(u3, 'Computer Science', 'BSc', 3, 1460, 'German/English');
+    const rtu = ins(
+      'Rīgas Tehniskā universitāte',
+      'Rīga',
+      'https://www.rtu.lv',
+      'Vadošā tehniskā augstskola Baltijā, dibināta 1862. gadā. Specializējas inženierzinātnēs, tehnoloģijās un arhitektūrā.',
+      2
+    );
+    prog(rtu, 'Datorzinātne un informācijas tehnoloģijas', 'BSc', 4, 2400);
+    prog(rtu, 'Elektrotehnika', 'BSc', 4, 2200);
+    prog(rtu, 'Arhitektūra', 'BSc', 4, 2200);
+    prog(rtu, 'Materiālzinātne', 'BSc', 4, 2000);
+    prog(rtu, 'Ķīmijas tehnoloģija', 'BSc', 4, 2000);
+
+    const rsu = ins(
+      'Rīgas Stradiņa universitāte',
+      'Rīga',
+      'https://www.rsu.lv',
+      'Vadošā medicīnas un veselības zinātņu universitāte Latvijā. Piedāvā studijas medicīnā, zobārstniecībā, farmācijā un sociālajās zinātnēs.',
+      3
+    );
+    prog(rsu, 'Medicīna', 'MD', 6, 8000, 'Latviešu/Angļu');
+    prog(rsu, 'Zobārstniecība', 'DDS', 5, 7000, 'Latviešu/Angļu');
+    prog(rsu, 'Farmācija', 'BSc', 4, 3000);
+    prog(rsu, 'Sabiedrības veselība', 'BSc', 3, 2500);
+
+    const lbtu = ins(
+      'Latvijas Biozinātņu un tehnoloģiju universitāte',
+      'Jelgava',
+      'https://www.lbtu.lv',
+      'Agrāk zināma kā Latvijas Lauksaimniecības universitāte. Specializējas lauksaimniecībā, pārtikas zinātnē, mežsaimniecībā un vides zinātnēs.',
+      4
+    );
+    prog(lbtu, 'Lauksaimniecība', 'BSc', 4, 1600);
+    prog(lbtu, 'Pārtikas zinātne un tehnoloģija', 'BSc', 4, 1800);
+    prog(lbtu, 'Mežzinātne', 'BSc', 4, 1600);
+    prog(lbtu, 'Vides zinātne', 'BSc', 4, 1700);
+
+    const du = ins(
+      'Daugavpils Universitāte',
+      'Daugavpils',
+      'https://www.du.lv',
+      'Reģionālā universitāte Austrumlatvijā, kas piedāvā studijas humanitārajās, sociālajās un dabaszinātnēs. Daudzvalodu vide — latviešu un krievu mācībvaloda.',
+      5
+    );
+    prog(du, 'Pedagoģija', 'BSc', 4, 1400);
+    prog(du, 'Angļu filoloģija', 'BA', 3, 1400);
+    prog(du, 'Bioloģija', 'BSc', 3, 1400);
+    prog(du, 'Sociālais darbs', 'BSc', 3, 1300);
+
+    const liepu = ins(
+      'Liepājas Universitāte',
+      'Liepāja',
+      'https://www.liepu.lv',
+      'Universitāte Latvijas rietumu piekrastē. Specializējas pedagoģijā, mūzikā, mākslā un humanitārajās zinātnēs.',
+      6
+    );
+    prog(liepu, 'Pedagoģija', 'BSc', 4, 1400);
+    prog(liepu, 'Mūzika', 'BSc', 4, 1500);
+    prog(liepu, 'Sociālais darbs', 'BSc', 3, 1300);
+
+    const via = ins(
+      'Vidzemes Augstskola',
+      'Valmiera',
+      'https://www.va.lv',
+      'Reģionālā augstskola Vidzemē. Specializējas komunikācijā, informācijas tehnoloģijās, tūrismā un uzņēmējdarbībā.',
+      7
+    );
+    prog(via, 'Informācijas tehnoloģijas', 'BSc', 3, 1600);
+    prog(via, 'Komunikācija', 'BA', 3, 1500);
+    prog(via, 'Tūrisma vadība', 'BSc', 3, 1500);
+
+    const rta = ins(
+      'Rēzeknes Tehnoloģiju akadēmija',
+      'Rēzekne',
+      'https://www.rta.lv',
+      'Tehnoloģiju un mākslas akadēmija Latgalē. Piedāvā studijas inženierzinātnēs, pedagoģijā un mākslā.',
+      8
+    );
+    prog(rta, 'Inženiermehānika', 'BSc', 4, 1400);
+    prog(rta, 'Pedagoģija', 'BSc', 4, 1300);
+    prog(rta, 'Dizains', 'BSc', 4, 1500);
+
+    const lma = ins(
+      'Latvijas Mākslas akadēmija',
+      'Rīga',
+      'https://www.lma.lv',
+      'Latvijas vadošā vizuālās mākslas augstskola, dibināta 1919. gadā. Piedāvā studijas glezniecībā, grafikā, dizainā, skulptūrā un mākslas teorijā.',
+      9
+    );
+    prog(lma, 'Glezniecība', 'BSc', 4, 1800);
+    prog(lma, 'Grafiskais dizains', 'BSc', 4, 1800);
+    prog(lma, 'Skulptūra', 'BSc', 4, 1800);
+
+    const jvlma = ins(
+      'Jāzepa Vītola Latvijas Mūzikas akadēmija',
+      'Rīga',
+      'https://www.jvlma.lv',
+      'Latvijas valsts mūzikas augstskola, dibināta 1919. gadā. Augstas klases muzikālā izglītība vijolē, klavierēs, diriģēšanā, kompozīcijā un citās disciplīnās.',
+      10
+    );
+    prog(jvlma, 'Klavierspēle', 'BSc', 4, 1700);
+    prog(jvlma, 'Diriģēšana', 'BSc', 4, 1700);
+    prog(jvlma, 'Kompozīcija', 'BSc', 4, 1700);
+
+    const lspa = ins(
+      'Latvijas Sporta pedagoģijas akadēmija',
+      'Rīga',
+      'https://www.lspa.lv',
+      'Specializēta augstskola sporta zinātnē, fiziskajā audzināšanā un veselības izglītībā.',
+      11
+    );
+    prog(lspa, 'Sports un fiziskā audzināšana', 'BSc', 4, 1500);
+    prog(lspa, 'Sporta zinātne', 'BSc', 4, 1500);
+
+    const riseba = ins(
+      'RISEBA Biznesa, mākslas un tehnoloģiju augstskola',
+      'Rīga',
+      'https://www.riseba.lv',
+      'Starptautiska privātā augstskola, kas piedāvā biznesa administrācijas, komunikācijas, arhitektūras un IT studijas angļu un latviešu valodā.',
+      12
+    );
+    prog(riseba, 'Biznesa administrācija', 'BSc', 3, 3200, 'Latviešu/Angļu');
+    prog(riseba, 'Komunikācija', 'BA', 3, 3000, 'Latviešu/Angļu');
+    prog(riseba, 'Arhitektūra', 'BSc', 4, 3400, 'Angļu');
+
+    const ba = ins(
+      'Banku augstskola',
+      'Rīga',
+      'https://www.ba.lv',
+      'Specializēta finanšu un banku augstskola. Piedāvā studijas finanšu vadībā, grāmatvedībā un uzņēmējdarbības analīzē.',
+      13
+    );
+    prog(ba, 'Finanšu vadība', 'BSc', 3, 2800);
+    prog(ba, 'Grāmatvedība', 'BSc', 3, 2600);
+    prog(ba, 'Uzņēmējdarbības analīze', 'BSc', 3, 2700);
+
+    const tsi = ins(
+      'Transporta un sakaru institūts',
+      'Rīga',
+      'https://www.tsi.lv',
+      'Augstskola ar specializāciju transporta, loģistikas, IT un telekomunikāciju jomā. Piedāvā studijas krievu, latviešu un angļu valodā.',
+      14
+    );
+    prog(tsi, 'Datorzinātnes', 'BSc', 4, 2200, 'Latviešu/Krievu');
+    prog(tsi, 'Loģistika un piegādes ķēžu vadība', 'BSc', 4, 2000, 'Latviešu/Krievu');
+    prog(tsi, 'Aviācijas transports', 'BSc', 4, 2400, 'Angļu');
+
+    const sse = ins(
+      'SSE Rīga (Rīgas Juridiskā augstskola)',
+      'Rīga',
+      'https://www.sseriga.edu',
+      'Augsta līmeņa biznesa augstskola, kas saistīta ar Stokholmas Ekonomikas augstskolu. Pilnībā angļu valodā. Ļoti konkurētspējīga uzņemšana.',
+      15
+    );
+    prog(sse, 'Ekonomika', 'BSc', 3, 8500, 'Angļu');
+    prog(sse, 'Biznesa vadība', 'BSc', 3, 8500, 'Angļu');
+
+    const turiba = ins(
+      'Biznesa augstskola Turība',
+      'Rīga',
+      'https://www.turiba.lv',
+      'Privāta biznesa augstskola ar plašu studiju programmu klāstu biznesa vadībā, tūrismā, tiesībās un komunikācijā.',
+      16
+    );
+    prog(turiba, 'Biznesa vadība', 'BSc', 3, 2500);
+    prog(turiba, 'Tiesību zinātne', 'BSc', 4, 2500);
+    prog(turiba, 'Tūrisma vadība', 'BSc', 3, 2300);
+
+    const lka = ins(
+      'Latvijas Kristīgā akadēmija',
+      'Rīga',
+      'https://www.lka.edu.lv',
+      'Privāta augstskola ar kristīgu ievirzi, kas piedāvā studijas teoloģijā, sociālajā darbā un pedagoģijā.',
+      17
+    );
+    prog(lka, 'Teoloģija', 'BA', 4, 1200);
+    prog(lka, 'Sociālais darbs', 'BSc', 3, 1200);
 
     save();
   }
 
   return db;
-}
-
-// Helpers that mirror better-sqlite3 API for ease of use
-
-function rowsFromExec(stmt) {
-  const results = db.exec(stmt);
-  if (!results.length) return [];
-  const { columns, values } = results[0];
-  return values.map(row => {
-    const obj = {};
-    columns.forEach((col, i) => { obj[col] = row[i]; });
-    return obj;
-  });
 }
 
 function preparedAll(sql, params = []) {
@@ -118,4 +299,6 @@ function preparedRun(sql, params = []) {
   return { lastInsertRowid: lastId, changes };
 }
 
-module.exports = { init, preparedAll, preparedGet, preparedRun, save };
+function getDb() { return db; }
+
+module.exports = { init, getDb, preparedAll, preparedGet, preparedRun, save };
