@@ -14,6 +14,8 @@ async function start() {
   // Routes must be required AFTER db is initialized
   const universitiesRouter = require('./routes/universities');
   const programsRouter = require('./routes/programs');
+  const authRouter = require('./routes/auth');
+  const adminRouter = require('./routes/admin');
 
   const app = express();
   const PORT = process.env.PORT || 3000;
@@ -21,6 +23,8 @@ async function start() {
   app.use(cors());
   app.use(express.json());
 
+  app.use('/api/auth', authRouter);
+  app.use('/api/admin', adminRouter);
   app.use('/api/universities', universitiesRouter);
   app.use('/api/programs', programsRouter);
 

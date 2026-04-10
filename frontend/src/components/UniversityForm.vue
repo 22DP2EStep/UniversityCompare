@@ -13,29 +13,29 @@ function submit() {
 <template>
   <div class="modal-overlay" @click.self="emit('cancel')">
     <div class="modal">
-      <h2>Add University</h2>
+      <h2>Pievienot universitāti</h2>
       <form @submit.prevent="submit" class="uni-form">
-        <label>Name *
-          <input v-model="form.name" required placeholder="e.g. Stanford University" />
+        <label>Nosaukums *
+          <input v-model="form.name" required placeholder="piem. Latvijas Universitāte" />
         </label>
-        <label>Location *
-          <input v-model="form.location" required placeholder="e.g. Stanford, CA" />
+        <label>Pilsēta *
+          <input v-model="form.location" required placeholder="piem. Rīga" />
         </label>
-        <label>Country *
-          <input v-model="form.country" required placeholder="e.g. USA" />
+        <label>Valsts *
+          <input v-model="form.country" required placeholder="piem. Latvija" />
         </label>
-        <label>Website
+        <label>Mājaslapa
           <input v-model="form.website" placeholder="https://..." />
         </label>
-        <label>World Ranking
-          <input v-model="form.ranking" type="number" min="1" placeholder="e.g. 3" />
+        <label>Pasaules reitings
+          <input v-model="form.ranking" type="number" min="1" placeholder="piem. 3" />
         </label>
-        <label class="full-width">Description
-          <textarea v-model="form.description" rows="3" placeholder="Brief description..."></textarea>
+        <label class="full-width">Apraksts
+          <textarea v-model="form.description" rows="3" placeholder="Īss apraksts..."></textarea>
         </label>
         <div class="form-actions full-width">
-          <button type="submit" class="btn btn-primary">Add University</button>
-          <button type="button" class="btn btn-secondary" @click="emit('cancel')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Pievienot universitāti</button>
+          <button type="button" class="btn btn-secondary" @click="emit('cancel')">Atcelt</button>
         </div>
       </form>
     </div>

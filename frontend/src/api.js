@@ -1,8 +1,16 @@
 const BASE_URL = 'http://localhost:3000/api';
 
+function getToken() {
+  return localStorage.getItem('uc_token');
+}
+
 async function request(path, options = {}) {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...options,
   });
   if (!res.ok) {
@@ -14,6 +22,23 @@ async function request(path, options = {}) {
 }
 
 export const api = {
+  admin: {
+    users: {
+      list: () => request('/admin/users'),
+      setRole: (id, role, expert_university_id = null) => request(`/admin/users/${id}/role`, { method: 'PUT', body: JSON.stringify({ role, expert_university_id }) }),
+      delete: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
+    },
+    universities: {
+      list: () => request('/admin/universities'),
+      create: (data) => request('/admin/universities', { method: 'POST', body: JSON.stringify(data) }),
+      update: (id, data) => request(`/admin/universities/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+      delete: (id) => request(`/admin/universities/${id}`, { method: 'DELETE' }),
+    },
+  },
+  auth: {
+    register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+    login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+  },
   universities: {
     list: (params = {}) => {
       const qs = new URLSearchParams(params).toString();
