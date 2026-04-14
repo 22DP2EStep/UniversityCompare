@@ -31,27 +31,37 @@ function formatTuition(val) {
     <div class="compare-panel">
 
       <div class="compare-header">
-        <h2>Universitāšu salīdzinājums</h2>
-        <button class="close-btn" @click="emit('close')">✕</button>
+        <div>
+          <h2>Universitāšu salīdzinājums</h2>
+          <p class="compare-sub">{{ ids.length }} universitātes izvēlētas</p>
+        </div>
+        <button class="close-btn" @click="emit('close')">&#10005;</button>
       </div>
 
       <div v-if="loading" class="state-msg">Ielādē...</div>
       <div v-else-if="error" class="state-msg error">{{ error }}</div>
 
       <div v-else class="compare-body">
-        <div class="compare-grid" :style="{ gridTemplateColumns: `160px repeat(${universities.length}, 1fr)` }">
+        <div class="compare-grid" :style="{ gridTemplateColumns: `180px repeat(${universities.length}, 1fr)` }">
 
-          <!-- Header row: university names -->
+          <!-- Header row -->
           <div class="cell label-col"></div>
           <div v-for="uni in universities" :key="uni.id" class="cell uni-header">
             <div class="uni-title">{{ uni.name }}</div>
             <div class="uni-sub">{{ uni.location }}, {{ uni.country }}</div>
           </div>
 
-          <!-- Ranking -->
-          <div class="cell row-label">Reitings</div>
-          <div v-for="uni in universities" :key="uni.id + '-r'" class="cell">
-            <span v-if="uni.ranking" class="badge rank">#{{ uni.ranking }}</span>
+          <!-- Latvia ranking -->
+          <div class="cell row-label">Reitings Latvijā</div>
+          <div v-for="uni in universities" :key="uni.id + '-rlv'" class="cell">
+            <span v-if="uni.ranking" class="badge badge-rank-lv">#{{ uni.ranking }} Latvijā</span>
+            <span v-else class="muted">—</span>
+          </div>
+
+          <!-- World ranking -->
+          <div class="cell row-label">Reitings pasaulē</div>
+          <div v-for="uni in universities" :key="uni.id + '-rw'" class="cell">
+            <span v-if="uni.ranking_world" class="badge badge-rank">&#9733; #{{ uni.ranking_world }}</span>
             <span v-else class="muted">—</span>
           </div>
 
@@ -76,14 +86,14 @@ function formatTuition(val) {
             <span class="badge">{{ uni.programs?.length ?? 0 }} progr.</span>
           </div>
 
-          <!-- Programs detail -->
+          <!-- Programs list -->
           <div class="cell row-label top">Programmu saraksts</div>
           <div v-for="uni in universities" :key="uni.id + '-pl'" class="cell programs-cell">
             <div v-if="!uni.programs?.length" class="muted">Nav programmu</div>
             <div v-for="p in uni.programs" :key="p.id" class="program-row">
               <div class="prog-name">{{ p.name }}</div>
               <div class="prog-meta">
-                <span class="badge degree">{{ p.degree }}</span>
+                <span class="badge badge-degree">{{ p.degree }}</span>
                 <span>{{ p.duration_years }}g.</span>
                 <span>{{ formatTuition(p.tuition_per_year) }}/g.</span>
                 <span class="muted">{{ p.language }}</span>
@@ -102,7 +112,7 @@ function formatTuition(val) {
 .compare-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.55);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -112,61 +122,69 @@ function formatTuition(val) {
 }
 
 .compare-panel {
-  background: white;
-  border-radius: 12px;
+  background: #fdfcfa;
+  border-radius: 10px;
   width: 100%;
   max-width: 1100px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border: 1px solid #d4d0c8;
 }
 
 .compare-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.1rem 1.5rem;
-  background: #1a56db;
+  padding: 1rem 1.5rem;
+  background: #1a1a1a;
   color: white;
   flex-shrink: 0;
+  border-bottom: 3px solid #0d9488;
 }
-.compare-header h2 { font-size: 1.1rem; }
+.compare-header h2 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+.compare-sub { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
 .close-btn {
-  background: rgba(255,255,255,0.15);
-  border: none;
-  color: white;
-  font-size: 1rem;
-  border-radius: 6px;
-  padding: 0.25rem 0.6rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid #2e2e2e;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  border-radius: 5px;
+  padding: 0.2rem 0.55rem;
   cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
 }
-.close-btn:hover { background: rgba(255,255,255,0.25); }
+.close-btn:hover { background: rgba(255,255,255,0.15); color: white; }
 
 .state-msg {
   padding: 2rem;
   text-align: center;
   color: #999;
+  font-size: 0.9rem;
 }
-.state-msg.error { color: #c53030; }
+.state-msg.error { color: #b91c1c; }
 
 .compare-body {
   overflow: auto;
   padding: 1.25rem;
+  background: #fdfcfa;
 }
 
 .compare-grid {
   display: grid;
   gap: 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #d4d0c8;
   border-radius: 8px;
   overflow: hidden;
 }
 
 .cell {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f0f0f0;
-  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #ede9e2;
+  border-right: 1px solid #ede9e2;
   font-size: 0.875rem;
   vertical-align: top;
 }
@@ -174,45 +192,51 @@ function formatTuition(val) {
 
 /* University name header */
 .uni-header {
-  background: #f0f4ff;
-  font-weight: 600;
+  background: #f0fdfa;
 }
-.uni-title { font-size: 1rem; font-weight: 700; color: #1a56db; }
-.uni-sub { font-size: 0.78rem; color: #666; margin-top: 2px; }
+.uni-title { font-size: 0.925rem; font-weight: 700; color: #0d9488; line-height: 1.3; }
+.uni-sub { font-size: 0.75rem; color: #888; margin-top: 3px; }
 
 /* Row labels */
-.label-col { background: #f7f8fa; }
+.label-col { background: #f5f4f0; }
 .row-label {
-  background: #f7f8fa;
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: #555;
+  background: #f5f4f0;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: #666;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
 }
 .row-label.top { vertical-align: top; }
 
 /* Badges */
 .badge {
   display: inline-block;
-  padding: 0.2rem 0.5rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 4px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  background: #edf2ff;
-  color: #1a56db;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #f0fdfa;
+  color: #0d9488;
 }
-.badge.rank { background: #fef3c7; color: #92400e; }
-.badge.degree { background: #e0f2fe; color: #0369a1; }
+.badge-rank { background: #fef3c7; color: #92400e; }
+.badge-rank-lv { background: #f0fdfa; color: #0f766e; }
+.badge-degree { background: #f0fdfa; color: #0d9488; }
 
 .muted { color: #aaa; font-size: 0.82rem; }
-.desc { color: #555; font-size: 0.82rem; line-height: 1.5; }
-.website-link { color: #1a56db; font-size: 0.82rem; text-decoration: none; }
+.desc { color: #555; font-size: 0.82rem; line-height: 1.55; }
+
+.website-link { color: #0d9488; font-size: 0.82rem; text-decoration: none; font-weight: 600; }
 .website-link:hover { text-decoration: underline; }
 
 /* Programs */
 .programs-cell { display: flex; flex-direction: column; gap: 0.6rem; }
-.program-row { padding: 0.5rem; background: #fafafa; border-radius: 6px; border: 1px solid #f0f0f0; }
-.prog-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; }
-.prog-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; font-size: 0.78rem; color: #555; }
+.program-row {
+  padding: 0.5rem 0.65rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #ede9e2;
+}
+.prog-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; color: #1a1a1a; }
+.prog-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; font-size: 0.78rem; color: #666; }
 </style>

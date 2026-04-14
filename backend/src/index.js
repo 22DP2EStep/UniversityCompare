@@ -16,6 +16,7 @@ async function start() {
   const programsRouter = require('./routes/programs');
   const authRouter = require('./routes/auth');
   const adminRouter = require('./routes/admin');
+  const profileRouter = require('./routes/profile');
 
   const app = express();
   const PORT = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ async function start() {
   app.use('/api/admin', adminRouter);
   app.use('/api/universities', universitiesRouter);
   app.use('/api/programs', programsRouter);
+  app.use('/api/profile', profileRouter);
 
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });

@@ -37,17 +37,17 @@ router.get('/:id', (req, res) => {
 
 // POST /api/universities
 router.post('/', (req, res) => {
-  const { name, location, country, website, description, ranking } = req.body;
+  const { name, location, country, website, description, ranking, ranking_world, image_url } = req.body;
   if (!name || !location || !country) {
     return res.status(400).json({ error: 'name, location, and country are required' });
   }
 
   const result = preparedRun(
-    'INSERT INTO universities (name, location, country, website, description, ranking) VALUES (?,?,?,?,?,?)',
-    [name, location, country, website || null, description || null, ranking || null]
+    'INSERT INTO universities (name, location, country, website, description, ranking, ranking_world, image_url) VALUES (?,?,?,?,?,?,?,?)',
+    [name, location, country, website || null, description || null, ranking || null, ranking_world || null, image_url || null]
   );
 
-  res.status(201).json({ id: result.lastInsertRowid, name, location, country, website, description, ranking });
+  res.status(201).json({ id: result.lastInsertRowid, name, location, country, website, description, ranking, ranking_world, image_url });
 });
 
 // PUT /api/universities/:id  — admin or expert assigned to this university
@@ -61,19 +61,21 @@ router.put('/:id', requireAuth, (req, res) => {
     }
   }
 
-  const { name, location, country, website, description, ranking } = req.body;
+  const { name, location, country, website, description, ranking, ranking_world, image_url } = req.body;
   const existing = preparedGet('SELECT * FROM universities WHERE id = ?', [req.params.id]);
   if (!existing) return res.status(404).json({ error: 'Universitāte nav atrasta.' });
 
   preparedRun(
-    'UPDATE universities SET name=?, location=?, country=?, website=?, description=?, ranking=? WHERE id=?',
+    'UPDATE universities SET name=?, location=?, country=?, website=?, description=?, ranking=?, ranking_world=?, image_url=? WHERE id=?',
     [
       name ?? existing.name,
       location ?? existing.location,
       country ?? existing.country,
       website ?? existing.website,
       description ?? existing.description,
-      ranking ?? existing.ranking,
+      ranking !== undefined ? (ranking || null) : existing.ranking,
+      ranking_world !== undefined ? (ranking_world || null) : existing.ranking_world,
+      image_url !== undefined ? (image_url || null) : existing.image_url,
       req.params.id,
     ]
   );

@@ -68,13 +68,13 @@ router.get('/universities', (req, res) => {
 
 // POST /api/admin/universities
 router.post('/universities', (req, res) => {
-  const { name, location, country, website, description, ranking } = req.body;
+  const { name, location, country, website, description, ranking, ranking_world, image_url } = req.body;
   if (!name || !location || !country) {
     return res.status(400).json({ error: 'Nosaukums, pilsēta un valsts ir obligāti.' });
   }
   const result = preparedRun(
-    'INSERT INTO universities (name, location, country, website, description, ranking) VALUES (?,?,?,?,?,?)',
-    [name, location, country, website || null, description || null, ranking || null]
+    'INSERT INTO universities (name, location, country, website, description, ranking, ranking_world, image_url) VALUES (?,?,?,?,?,?,?,?)',
+    [name, location, country, website || null, description || null, ranking || null, ranking_world || null, image_url || null]
   );
   res.status(201).json(preparedGet('SELECT * FROM universities WHERE id = ?', [result.lastInsertRowid]));
 });
@@ -84,9 +84,9 @@ router.put('/universities/:id', (req, res) => {
   const existing = preparedGet('SELECT * FROM universities WHERE id = ?', [req.params.id]);
   if (!existing) return res.status(404).json({ error: 'Universitāte nav atrasta.' });
 
-  const { name, location, country, website, description, ranking } = req.body;
+  const { name, location, country, website, description, ranking, ranking_world, image_url } = req.body;
   preparedRun(
-    'UPDATE universities SET name=?, location=?, country=?, website=?, description=?, ranking=? WHERE id=?',
+    'UPDATE universities SET name=?, location=?, country=?, website=?, description=?, ranking=?, ranking_world=?, image_url=? WHERE id=?',
     [
       name ?? existing.name,
       location ?? existing.location,
@@ -94,6 +94,8 @@ router.put('/universities/:id', (req, res) => {
       website !== undefined ? website : existing.website,
       description !== undefined ? description : existing.description,
       ranking !== undefined ? ranking || null : existing.ranking,
+      ranking_world !== undefined ? ranking_world || null : existing.ranking_world,
+      image_url !== undefined ? image_url || null : existing.image_url,
       req.params.id,
     ]
   );

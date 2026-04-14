@@ -23,6 +23,10 @@ async function init() {
 
   db.run(`PRAGMA foreign_keys = ON;`);
 
+  // Migrations
+  try { db.run('ALTER TABLE universities ADD COLUMN ranking_world INTEGER'); } catch (_) {}
+  try { db.run('ALTER TABLE universities ADD COLUMN image_url TEXT'); } catch (_) {}
+
   db.run(`
     CREATE TABLE IF NOT EXISTS universities (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

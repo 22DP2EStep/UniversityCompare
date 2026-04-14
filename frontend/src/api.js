@@ -54,4 +54,8 @@ export const api = {
     create: (data) => request('/programs', { method: 'POST', body: JSON.stringify(data) }),
     delete: (id) => request(`/programs/${id}`, { method: 'DELETE' }),
   },
+  profile: {
+    updateName: (data) => request('/profile/name', { method: 'PUT', body: JSON.stringify(data) }),
+    updatePassword: (data) => request('/profile/password', { method: 'PUT', body: JSON.stringify(data) }),
+  },
 };

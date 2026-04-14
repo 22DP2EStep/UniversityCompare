@@ -2,10 +2,14 @@
 import { ref } from 'vue'
 
 const emit = defineEmits(['submit', 'cancel'])
-const form = ref({ name: '', location: '', country: '', website: '', description: '', ranking: '' })
+const form = ref({ name: '', location: '', country: '', website: '', description: '', ranking: '', ranking_world: '' })
 
 function submit() {
-  const data = { ...form.value, ranking: form.value.ranking ? Number(form.value.ranking) : null }
+  const data = {
+    ...form.value,
+    ranking: form.value.ranking ? Number(form.value.ranking) : null,
+    ranking_world: form.value.ranking_world ? Number(form.value.ranking_world) : null,
+  }
   emit('submit', data)
 }
 </script>
@@ -27,8 +31,11 @@ function submit() {
         <label>Mājaslapa
           <input v-model="form.website" placeholder="https://..." />
         </label>
-        <label>Pasaules reitings
+        <label>Reitings Latvijā
           <input v-model="form.ranking" type="number" min="1" placeholder="piem. 3" />
+        </label>
+        <label>Reitings pasaulē
+          <input v-model="form.ranking_world" type="number" min="1" placeholder="piem. 800" />
         </label>
         <label class="full-width">Apraksts
           <textarea v-model="form.description" rows="3" placeholder="Īss apraksts..."></textarea>
