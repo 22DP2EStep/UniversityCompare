@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from '../api.js'
+import { t } from '../i18n.js'
 
 const props = defineProps({ ids: Array })
 const emit = defineEmits(['close'])
@@ -32,13 +33,13 @@ function formatTuition(val) {
 
       <div class="compare-header">
         <div>
-          <h2>Universitāšu salīdzinājums</h2>
-          <p class="compare-sub">{{ ids.length }} universitātes izvēlētas</p>
+          <h2>{{ t('compareTitle') }}</h2>
+          <p class="compare-sub">{{ ids.length }} {{ t('universitiesSelected') }}</p>
         </div>
         <button class="close-btn" @click="emit('close')">&#10005;</button>
       </div>
 
-      <div v-if="loading" class="state-msg">Ielādē...</div>
+      <div v-if="loading" class="state-msg">{{ t('loading') }}</div>
       <div v-else-if="error" class="state-msg error">{{ error }}</div>
 
       <div v-else class="compare-body">
@@ -52,50 +53,43 @@ function formatTuition(val) {
           </div>
 
           <!-- Latvia ranking -->
-          <div class="cell row-label">Reitings Latvijā</div>
+          <div class="cell row-label">{{ t('rankLatvia') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-rlv'" class="cell">
-            <span v-if="uni.ranking" class="badge badge-rank-lv">#{{ uni.ranking }} Latvijā</span>
-            <span v-else class="muted">—</span>
-          </div>
-
-          <!-- World ranking -->
-          <div class="cell row-label">Reitings pasaulē</div>
-          <div v-for="uni in universities" :key="uni.id + '-rw'" class="cell">
-            <span v-if="uni.ranking_world" class="badge badge-rank">&#9733; #{{ uni.ranking_world }}</span>
+            <span v-if="uni.ranking" class="badge badge-rank-lv">#{{ uni.ranking }} {{ t('inLatvia') }}</span>
             <span v-else class="muted">—</span>
           </div>
 
           <!-- Website -->
-          <div class="cell row-label">Mājaslapa</div>
+          <div class="cell row-label">{{ t('website') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-w'" class="cell">
             <a v-if="uni.website" :href="uni.website" target="_blank" class="website-link">
-              Atvērt ↗
+              {{ t('openWebsite') }}
             </a>
             <span v-else class="muted">—</span>
           </div>
 
           <!-- Description -->
-          <div class="cell row-label">Apraksts</div>
+          <div class="cell row-label">{{ t('description') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-d'" class="cell desc">
             {{ uni.description || '—' }}
           </div>
 
           <!-- Programs count -->
-          <div class="cell row-label">Programmas</div>
+          <div class="cell row-label">{{ t('programs') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-pc'" class="cell">
-            <span class="badge">{{ uni.programs?.length ?? 0 }} progr.</span>
+            <span class="badge">{{ uni.programs?.length ?? 0 }} {{ t('progAbbr') }}</span>
           </div>
 
           <!-- Programs list -->
-          <div class="cell row-label top">Programmu saraksts</div>
+          <div class="cell row-label top">{{ t('programsList') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-pl'" class="cell programs-cell">
-            <div v-if="!uni.programs?.length" class="muted">Nav programmu</div>
+            <div v-if="!uni.programs?.length" class="muted">{{ t('noProgramsList') }}</div>
             <div v-for="p in uni.programs" :key="p.id" class="program-row">
               <div class="prog-name">{{ p.name }}</div>
               <div class="prog-meta">
                 <span class="badge badge-degree">{{ p.degree }}</span>
-                <span>{{ p.duration_years }}g.</span>
-                <span>{{ formatTuition(p.tuition_per_year) }}/g.</span>
+                <span>{{ p.duration_years }}{{ t('yearAbbr') }}</span>
+                <span>{{ formatTuition(p.tuition_per_year) }}/{{ t('yearAbbr') }}</span>
                 <span class="muted">{{ p.language }}</span>
               </div>
             </div>

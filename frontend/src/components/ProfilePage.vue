@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { api } from '../api.js'
+import { t } from '../i18n.js'
 
 const props = defineProps({ user: Object })
 const emit = defineEmits(['back', 'updated'])
@@ -13,7 +14,7 @@ const saving = ref(false)
 const nameForm = ref({ name: props.user.name })
 const passForm = ref({ current: '', newPass: '', confirm: '' })
 
-const ROLE_LABELS = { user: 'Lietotājs', expert: 'Eksperts', admin: 'Administrators' }
+const ROLE_LABELS = computed(() => ({ user: t('roleUser'), expert: t('roleExpert'), admin: t('roleAdmin') }))
 const ROLE_COLORS = { user: '#555', expert: '#92400e', admin: '#0f766e' }
 const ROLE_BG    = { user: '#f5f4f0', expert: '#fef3c7', admin: '#f0fdfa' }
 
@@ -30,7 +31,7 @@ async function saveName() {
     const res = await api.profile.updateName({ name: nameForm.value.name.trim() })
     localStorage.setItem('uc_user', JSON.stringify(res.user))
     emit('updated', res.user)
-    success.value = 'Vārds veiksmīgi atjaunināts.'
+    success.value = t('nameUpdated')
   } catch (e) {
     error.value = e.message
   } finally {
@@ -42,11 +43,11 @@ async function savePassword() {
   error.value = ''
   success.value = ''
   if (passForm.value.newPass !== passForm.value.confirm) {
-    error.value = 'Jaunās paroles nesakrīt.'
+    error.value = t('newPasswordMismatch')
     return
   }
   if (passForm.value.newPass.length < 6) {
-    error.value = 'Parolei jābūt vismaz 6 rakstzīmes.'
+    error.value = t('passwordTooShort')
     return
   }
   saving.value = true
@@ -56,7 +57,7 @@ async function savePassword() {
       new_password: passForm.value.newPass,
     })
     passForm.value = { current: '', newPass: '', confirm: '' }
-    success.value = 'Parole veiksmīgi nomainīta.'
+    success.value = t('passwordChanged')
   } catch (e) {
     error.value = e.message
   } finally {
@@ -81,11 +82,11 @@ function switchTab(t) {
           <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
             <path d="M9 1L3 7l6 6"/>
           </svg>
-          Atpakaļ
+          {{ t('back') }}
         </button>
         <div class="page-title-group">
-          <h1 class="page-title">Profils</h1>
-          <p class="page-subtitle">Pārvaldiet sava konta iestatījumus</p>
+          <h1 class="page-title">{{ t('profileTitle') }}</h1>
+          <p class="page-subtitle">{{ t('profileSubtitle') }}</p>
         </div>
       </div>
     </div>
@@ -108,14 +109,14 @@ function switchTab(t) {
             </span>
           </div>
           <div v-if="user.role === 'expert' && user.expert_university_id" class="identity-expert-note">
-            Eksperts piesaistīts universitātei #{{ user.expert_university_id }}
+            {{ t('expertAssigned') }}{{ user.expert_university_id }}
           </div>
         </div>
 
         <!-- Tabs -->
         <div class="profile-tabs">
-          <button :class="['ptab', tab === 'info' && 'active']" @click="switchTab('info')">Informācija</button>
-          <button :class="['ptab', tab === 'password' && 'active']" @click="switchTab('password')">Parole</button>
+          <button :class="['ptab', tab === 'info' && 'active']" @click="switchTab('info')">{{ t('tabInfo') }}</button>
+          <button :class="['ptab', tab === 'password' && 'active']" @click="switchTab('password')">{{ t('tabPassword') }}</button>
         </div>
 
         <!-- Messages -->
@@ -124,33 +125,33 @@ function switchTab(t) {
 
         <!-- Info tab -->
         <div v-if="tab === 'info'" class="tab-content">
-          <div class="section-label">Rediģēt vārdu</div>
+          <div class="section-label">{{ t('editName') }}</div>
           <div class="field-row">
             <input
               v-model="nameForm.name"
               class="field-input"
-              placeholder="Pilns vārds"
+              :placeholder="t('fullName')"
               @keyup.enter="saveName"
             />
             <button class="btn btn-primary" :disabled="saving" @click="saveName">
-              {{ saving ? 'Saglabā...' : 'Saglabāt' }}
+              {{ saving ? t('saving') : t('save') }}
             </button>
           </div>
 
           <div class="info-grid">
             <div class="info-row">
-              <span class="info-label">E-pasts</span>
+              <span class="info-label">{{ t('emailReadonly') }}</span>
               <span class="info-value">{{ user.email }}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Loma</span>
+              <span class="info-label">{{ t('roleLabel') }}</span>
               <span
                 class="role-badge"
                 :style="{ background: ROLE_BG[user.role], color: ROLE_COLORS[user.role] }"
               >{{ ROLE_LABELS[user.role] || user.role }}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Konts izveidots</span>
+              <span class="info-label">{{ t('accountCreated') }}</span>
               <span class="info-value">{{ user.created_at ? new Date(user.created_at).toLocaleDateString('lv-LV') : '—' }}</span>
             </div>
           </div>
@@ -158,19 +159,19 @@ function switchTab(t) {
 
         <!-- Password tab -->
         <div v-if="tab === 'password'" class="tab-content">
-          <div class="section-label">Nomainīt paroli</div>
+          <div class="section-label">{{ t('changePasswordTitle') }}</div>
           <div class="pass-form">
-            <label class="field-label">Pašreizējā parole
+            <label class="field-label">{{ t('currentPassword') }}
               <input v-model="passForm.current" type="password" class="field-input" placeholder="••••••••" />
             </label>
-            <label class="field-label">Jaunā parole
-              <input v-model="passForm.newPass" type="password" class="field-input" placeholder="Vismaz 6 rakstzīmes" />
+            <label class="field-label">{{ t('newPassword') }}
+              <input v-model="passForm.newPass" type="password" class="field-input" :placeholder="t('passwordPlaceholder')" />
             </label>
-            <label class="field-label">Apstiprināt jauno paroli
-              <input v-model="passForm.confirm" type="password" class="field-input" placeholder="Atkārtojiet paroli" />
+            <label class="field-label">{{ t('confirmNewPassword') }}
+              <input v-model="passForm.confirm" type="password" class="field-input" :placeholder="t('repeatPlaceholder')" />
             </label>
             <button class="btn btn-primary btn-full" :disabled="saving" @click="savePassword">
-              {{ saving ? 'Saglabā...' : 'Nomainīt paroli' }}
+              {{ saving ? t('saving') : t('changePasswordBtn') }}
             </button>
           </div>
         </div>

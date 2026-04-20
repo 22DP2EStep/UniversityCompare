@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from '../api.js'
+import { t } from '../i18n.js'
 
 const emit = defineEmits(['back'])
 
@@ -90,8 +91,8 @@ async function submitUniForm() {
 
 async function deleteUni(id, name) {
   const ok = await askConfirm(
-    'Dzēst universitāti?',
-    `Vai tiešām vēlaties dzēst "${name}"? Tiks dzēstas arī visas tās programmas. Šo darbību nevar atsaukt.`
+    t('deleteUniTitle'),
+    `${t('deleteUniMsg')} "${name}"? ${t('deleteUniMsg2')}`
   )
   if (!ok) return
   error.value = ''
@@ -161,8 +162,8 @@ async function assignExpert(user) {
 
 async function deleteUser(id, name) {
   const ok = await askConfirm(
-    'Dzēst lietotāju?',
-    `Vai tiešām vēlaties dzēst lietotāju "${name}"? Šo darbību nevar atsaukt.`
+    t('deleteUserTitle'),
+    `${t('deleteUserMsg')} "${name}"? ${t('deleteUserMsg2')}`
   )
   if (!ok) return
   error.value = ''
@@ -194,11 +195,11 @@ onMounted(() => loadUniversities())
           <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
             <path d="M9 1L3 7l6 6"/>
           </svg>
-          Atpakaļ
+          {{ t('back') }}
         </button>
         <div class="page-title-group">
-          <h1 class="page-title">Administrācijas panelis</h1>
-          <p class="page-subtitle">Pārvaldiet universitātes un lietotājus</p>
+          <h1 class="page-title">{{ t('adminTitle') }}</h1>
+          <p class="page-subtitle">{{ t('adminSubtitle') }}</p>
         </div>
       </div>
     </div>
@@ -209,10 +210,10 @@ onMounted(() => loadUniversities())
       <div class="admin-card">
         <div class="admin-tabs">
           <button :class="['atab', tab === 'universities' && 'active']" @click="switchTab('universities')">
-            Universitātes
+            {{ t('tabUniversities') }}
           </button>
           <button :class="['atab', tab === 'users' && 'active']" @click="switchTab('users')">
-            Lietotāji
+            {{ t('tabUsers') }}
           </button>
         </div>
 
@@ -221,56 +222,56 @@ onMounted(() => loadUniversities())
         <!-- ── Universities tab ── -->
         <div v-if="tab === 'universities'" class="tab-body">
           <div class="tab-toolbar">
-            <span class="count">{{ universities.length }} ieraksti</span>
-            <button class="btn btn-primary" @click="openAddUni">+ Pievienot universitāti</button>
+            <span class="count">{{ universities.length }} {{ t('records') }}</span>
+            <button class="btn btn-primary" @click="openAddUni">{{ t('addUniversity') }}</button>
           </div>
 
           <div v-if="showUniForm" class="inline-form">
-            <h3>{{ editingUni ? 'Rediģēt universitāti' : 'Jauna universitāte' }}</h3>
+            <h3>{{ editingUni ? t('editUniversityTitle') : t('newUniversityTitle') }}</h3>
             <form @submit.prevent="submitUniForm" class="uni-grid">
-              <label>Nosaukums *
+              <label>{{ t('nameField') }}
                 <input v-model="uniForm.name" required placeholder="piem. Latvijas Universitāte" />
               </label>
-              <label>Pilsēta *
+              <label>{{ t('cityField') }}
                 <input v-model="uniForm.location" required placeholder="piem. Rīga" />
               </label>
-              <label>Valsts *
+              <label>{{ t('countryField') }}
                 <input v-model="uniForm.country" required placeholder="piem. Latvija" />
               </label>
-              <label>Mājaslapa
+              <label>{{ t('websiteField') }}
                 <input v-model="uniForm.website" placeholder="https://..." />
               </label>
-              <label class="span2">Attēla URL
-                <input v-model="uniForm.image_url" placeholder="https://... (saite uz universitātes attēlu)" />
+              <label class="span2">{{ t('imageUrlField') }}
+                <input v-model="uniForm.image_url" placeholder="https://..." />
               </label>
-              <label>Reitings Latvijā
+              <label>{{ t('rankingLatviaField') }}
                 <input v-model="uniForm.ranking" type="number" min="1" placeholder="piem. 3" />
               </label>
-              <label>Reitings pasaulē
+              <label>{{ t('rankingWorldField') }}
                 <input v-model="uniForm.ranking_world" type="number" min="1" placeholder="piem. 800" />
               </label>
-              <label class="span2">Apraksts
-                <textarea v-model="uniForm.description" rows="2" placeholder="Īss apraksts..."></textarea>
+              <label class="span2">{{ t('descriptionField') }}
+                <textarea v-model="uniForm.description" rows="2"></textarea>
               </label>
               <div class="form-actions span2">
                 <button type="submit" class="btn btn-primary">
-                  {{ editingUni ? 'Saglabāt' : 'Pievienot' }}
+                  {{ editingUni ? t('save') : t('add') }}
                 </button>
-                <button type="button" class="btn btn-secondary" @click="closeUniForm">Atcelt</button>
+                <button type="button" class="btn btn-secondary" @click="closeUniForm">{{ t('cancel') }}</button>
               </div>
             </form>
           </div>
 
-          <div v-if="uniLoading" class="loading">Ielādē...</div>
+          <div v-if="uniLoading" class="loading">{{ t('loading') }}</div>
           <table v-else-if="universities.length" class="data-table">
             <thead>
               <tr>
                 <th>#</th>
-                <th>Nosaukums</th>
-                <th>Atrašanās vieta</th>
-                <th>Valsts</th>
-                <th>Reitings</th>
-                <th>Darbības</th>
+                <th>{{ t('colName') }}</th>
+                <th>{{ t('colLocation') }}</th>
+                <th>{{ t('colCountry') }}</th>
+                <th>{{ t('colRanking') }}</th>
+                <th>{{ t('colActions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -281,32 +282,32 @@ onMounted(() => loadUniversities())
                 <td>{{ uni.country }}</td>
                 <td>{{ uni.ranking ?? '—' }}</td>
                 <td class="actions">
-                  <button class="btn btn-edit" @click="openEditUni(uni)">Rediģēt</button>
-                  <button class="btn btn-danger btn-sm" @click="deleteUni(uni.id, uni.name)">Dzēst</button>
+                  <button class="btn btn-edit" @click="openEditUni(uni)">{{ t('edit') }}</button>
+                  <button class="btn btn-danger btn-sm" @click="deleteUni(uni.id, uni.name)">{{ t('delete') }}</button>
                 </td>
               </tr>
             </tbody>
           </table>
-          <div v-else class="empty-state">Nav universitāšu.</div>
+          <div v-else class="empty-state">{{ t('noUniversities') }}</div>
         </div>
 
         <!-- ── Users tab ── -->
         <div v-if="tab === 'users'" class="tab-body">
           <div class="tab-toolbar">
-            <span class="count">{{ users.length }} lietotāji</span>
+            <span class="count">{{ users.length }} {{ t('usersCount') }}</span>
           </div>
 
-          <div v-if="usersLoading" class="loading">Ielādē...</div>
+          <div v-if="usersLoading" class="loading">{{ t('loading') }}</div>
           <table v-else-if="users.length" class="data-table">
             <thead>
               <tr>
                 <th>#</th>
-                <th>Vārds</th>
-                <th>E-pasts</th>
-                <th>Loma</th>
-                <th>Universitāte (ekspertam)</th>
-                <th>Reģistrēts</th>
-                <th>Darbības</th>
+                <th>{{ t('colName') }}</th>
+                <th>{{ t('emailLabel') }}</th>
+                <th>{{ t('colRole') }}</th>
+                <th>{{ t('colExpertUni') }}</th>
+                <th>{{ t('colRegistered') }}</th>
+                <th>{{ t('colActions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -321,31 +322,31 @@ onMounted(() => loadUniversities())
                     :disabled="savingRole === user.id"
                     :class="['role-select', `role-${user.role}`]"
                   >
-                    <option value="user">Lietotājs</option>
-                    <option value="expert">Eksperts</option>
-                    <option value="admin">Administrators</option>
+                    <option value="user">{{ t('roleUser') }}</option>
+                    <option value="expert">{{ t('roleExpert') }}</option>
+                    <option value="admin">{{ t('roleAdmin') }}</option>
                   </select>
                 </td>
                 <td>
                   <div v-if="user.role === 'expert'" class="expert-assign">
                     <select v-model="pendingExpertUni[user.id]" class="uni-select" :disabled="savingRole === user.id">
-                      <option value="">— izvēlieties —</option>
+                      <option value="">{{ t('selectUni') }}</option>
                       <option v-for="u in universities" :key="u.id" :value="u.id">{{ u.name }}</option>
                     </select>
                     <button class="btn btn-edit btn-sm" :disabled="savingRole === user.id" @click="assignExpert(user)">
-                      Saglabāt
+                      {{ t('save') }}
                     </button>
                   </div>
                   <span v-else class="muted">—</span>
                 </td>
                 <td class="muted">{{ new Date(user.created_at).toLocaleDateString('lv-LV') }}</td>
                 <td class="actions">
-                  <button class="btn btn-danger btn-sm" @click="deleteUser(user.id, user.name)">Dzēst</button>
+                  <button class="btn btn-danger btn-sm" @click="deleteUser(user.id, user.name)">{{ t('delete') }}</button>
                 </td>
               </tr>
             </tbody>
           </table>
-          <div v-else class="empty-state">Nav lietotāju.</div>
+          <div v-else class="empty-state">{{ t('noUsers') }}</div>
         </div>
       </div>
 
@@ -359,8 +360,8 @@ onMounted(() => loadUniversities())
           <h3 class="confirm-title">{{ confirm.title }}</h3>
           <p class="confirm-msg">{{ confirm.message }}</p>
           <div class="confirm-actions">
-            <button class="btn btn-danger" @click="confirmYes">Jā, dzēst</button>
-            <button class="btn btn-secondary" @click="confirmNo">Atcelt</button>
+            <button class="btn btn-danger" @click="confirmYes">{{ t('yesDelete') }}</button>
+            <button class="btn btn-secondary" @click="confirmNo">{{ t('cancel') }}</button>
           </div>
         </div>
       </div>

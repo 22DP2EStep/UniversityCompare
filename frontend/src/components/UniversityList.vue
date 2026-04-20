@@ -1,4 +1,6 @@
 <script setup>
+import { t } from '../i18n.js'
+
 const props = defineProps({
   universities: Array,
   selectedId: Number,
@@ -24,7 +26,7 @@ function initials(name) {
 <template>
   <div>
     <div v-if="universities.length === 0" class="empty-state">
-      <p>Nav atrasts neviens ieraksts.</p>
+      <p>{{ t('noResults') }}</p>
     </div>
 
     <div class="grid" v-else>
@@ -44,7 +46,7 @@ function initials(name) {
             v-if="canCompare"
             class="compare-btn"
             :class="{ active: compareIds.includes(uni.id) }"
-            :title="compareIds.includes(uni.id) ? 'Noņemt no salīdzinājuma' : 'Pievienot salīdzinājumam'"
+            :title="compareIds.includes(uni.id) ? t('removeCompare') : t('addCompare')"
             @click.stop="emit('toggle-compare', uni.id)"
           >
             <svg v-if="compareIds.includes(uni.id)" viewBox="0 0 12 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
@@ -72,16 +74,16 @@ function initials(name) {
           <!-- Tags row -->
           <div class="card-tags">
             <span v-if="uni.ranking" class="tag tag-rank-lv">
-              #{{ uni.ranking }} Latvijā
+              #{{ uni.ranking }} {{ t('inLatvia') }}
             </span>
             <span v-if="uni.ranking_world" class="tag tag-rank-world">
-              &#9733; #{{ uni.ranking_world }} pasaulē
+              &#9733; #{{ uni.ranking_world }} {{ t('inWorld') }}
             </span>
           </div>
 
           <!-- Action -->
           <button class="card-cta">
-            Skatīt detaļas
+            {{ t('viewDetails') }}
             <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
               <path d="M1 7h12M7 1l6 6-6 6"/>
             </svg>

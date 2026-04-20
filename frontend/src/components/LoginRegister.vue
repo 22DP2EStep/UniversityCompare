@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { api } from '../api.js'
+import { t } from '../i18n.js'
 
 const emit = defineEmits(['authenticated', 'close'])
 
@@ -34,7 +35,7 @@ async function handleLogin() {
 async function handleRegister() {
   error.value = ''
   if (registerForm.value.password !== registerForm.value.confirm) {
-    error.value = 'Paroles nesakrīt.'
+    error.value = t('passwordsMismatch')
     return
   }
   loading.value = true
@@ -60,12 +61,12 @@ async function handleRegister() {
     <div class="auth-card">
       <div class="auth-logo">
         <h1>UniversityCompare</h1>
-        <p>Atrodiet un salīdziniet universitātes visā pasaulē</p>
+        <p>{{ t('authTagline') }}</p>
       </div>
 
       <div class="auth-tabs">
-        <button :class="['tab-btn', tab === 'login' && 'active']" @click="switchTab('login')">Pieslēgties</button>
-        <button :class="['tab-btn', tab === 'register' && 'active']" @click="switchTab('register')">Reģistrēties</button>
+        <button :class="['tab-btn', tab === 'login' && 'active']" @click="switchTab('login')">{{ t('login') }}</button>
+        <button :class="['tab-btn', tab === 'register' && 'active']" @click="switchTab('register')">{{ t('register') }}</button>
       </div>
 
       <div v-if="error" class="auth-error">{{ error }}</div>
@@ -73,41 +74,41 @@ async function handleRegister() {
       <!-- Login Form -->
       <form v-if="tab === 'login'" class="auth-form" @submit.prevent="handleLogin">
         <div class="field">
-          <label>E-pasts</label>
-          <input v-model="loginForm.email" type="email" placeholder="jūs@piemers.lv" required autocomplete="email" />
+          <label>{{ t('emailLabel') }}</label>
+          <input v-model="loginForm.email" type="email" :placeholder="t('emailPlaceholder')" required autocomplete="email" />
         </div>
         <div class="field">
-          <label>Parole</label>
+          <label>{{ t('passwordLabel') }}</label>
           <input v-model="loginForm.password" type="password" placeholder="••••••••" required autocomplete="current-password" />
         </div>
         <button type="submit" class="submit-btn" :disabled="loading">
-          {{ loading ? 'Piesakās...' : 'Pieslēgties' }}
+          {{ loading ? t('signingIn') : t('login') }}
         </button>
-        <p class="switch-hint">Nav konta? <span @click="switchTab('register')">Reģistrējieties šeit</span></p>
+        <p class="switch-hint">{{ t('noAccount') }} <span @click="switchTab('register')">{{ t('registerHere') }}</span></p>
       </form>
 
       <!-- Register Form -->
       <form v-if="tab === 'register'" class="auth-form" @submit.prevent="handleRegister">
         <div class="field">
-          <label>Pilns vārds</label>
-          <input v-model="registerForm.name" type="text" placeholder="Jānis Bērziņš" required autocomplete="name" />
+          <label>{{ t('fullName') }}</label>
+          <input v-model="registerForm.name" type="text" :placeholder="t('namePlaceholder')" required autocomplete="name" />
         </div>
         <div class="field">
-          <label>E-pasts</label>
-          <input v-model="registerForm.email" type="email" placeholder="jūs@piemers.lv" required autocomplete="email" />
+          <label>{{ t('emailLabel') }}</label>
+          <input v-model="registerForm.email" type="email" :placeholder="t('emailPlaceholder')" required autocomplete="email" />
         </div>
         <div class="field">
-          <label>Parole</label>
-          <input v-model="registerForm.password" type="password" placeholder="Vismaz 6 rakstzīmes" required autocomplete="new-password" />
+          <label>{{ t('passwordLabel') }}</label>
+          <input v-model="registerForm.password" type="password" :placeholder="t('passwordPlaceholder')" required autocomplete="new-password" />
         </div>
         <div class="field">
-          <label>Apstiprināt paroli</label>
-          <input v-model="registerForm.confirm" type="password" placeholder="Atkārtojiet paroli" required autocomplete="new-password" />
+          <label>{{ t('confirmPassword') }}</label>
+          <input v-model="registerForm.confirm" type="password" :placeholder="t('repeatPlaceholder')" required autocomplete="new-password" />
         </div>
         <button type="submit" class="submit-btn" :disabled="loading">
-          {{ loading ? 'Izveido kontu...' : 'Izveidot kontu' }}
+          {{ loading ? t('creatingAccount') : t('createAccount') }}
         </button>
-        <p class="switch-hint">Jau ir konts? <span @click="switchTab('login')">Pieslēgties</span></p>
+        <p class="switch-hint">{{ t('alreadyHaveAccount') }} <span @click="switchTab('login')">{{ t('signInLink') }}</span></p>
       </form>
     </div>
   </div>
@@ -115,12 +116,15 @@ async function handleRegister() {
 
 <style scoped>
 .auth-backdrop {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  z-index: 250;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #1a56db 0%, #0f3a99 100%);
   padding: 1rem;
+  overflow-y: auto;
 }
 
 .auth-card {

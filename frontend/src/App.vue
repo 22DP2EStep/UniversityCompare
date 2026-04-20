@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from './api.js'
+import { lang, toggleLang, t } from './i18n.js'
 import LoginRegister from './components/LoginRegister.vue'
 import UniversityList from './components/UniversityList.vue'
 import UniversityDetail from './components/UniversityDetail.vue'
@@ -89,30 +90,36 @@ async function loadUniversities() {
           <div class="brand-logo">UC</div>
           <div>
             <div class="brand-name">UniversityCompare</div>
-            <div class="brand-sub">Jūsu ceļvedis augstākajā izglītībā</div>
+            <div class="brand-sub">{{ t('brandSub') }}</div>
           </div>
         </div>
 
         <nav class="header-nav">
+          <button class="btn-lang" @click="toggleLang" :title="lang === 'lv' ? 'Switch to English' : 'Pārslēgt uz latviešu'">
+            <span :class="{ 'lang-active': lang === 'lv' }">LV</span>
+            <span class="lang-sep">|</span>
+            <span :class="{ 'lang-active': lang === 'en' }">EN</span>
+          </button>
+
           <template v-if="currentUser">
-            <button v-if="currentUser.role === 'admin'" class="btn btn-admin" @click="currentPage = 'admin'">&#9881; Admin</button>
+            <button v-if="currentUser.role === 'admin'" class="btn btn-admin" @click="currentPage = 'admin'">&#9881; {{ t('adminBtn') }}</button>
             <div class="user-menu">
-              <div class="user-avatar" @click="currentPage = 'profile'" title="Skatīt profilu">{{ currentUser.name.charAt(0).toUpperCase() }}</div>
+              <div class="user-avatar" @click="currentPage = 'profile'" :title="t('viewProfile')">{{ currentUser.name.charAt(0).toUpperCase() }}</div>
               <span class="user-name" @click="currentPage = 'profile'" style="cursor:pointer">{{ currentUser.name }}</span>
-              <button class="btn btn-logout" @click="handleLogout">Iziet</button>
+              <button class="btn btn-logout" @click="handleLogout">{{ t('logout') }}</button>
             </div>
           </template>
           <template v-else>
-            <button class="btn btn-login" @click="showAuthModal = true">Pieslēgties</button>
-            <button class="btn btn-register" @click="showAuthModal = true">Reģistrēties</button>
+            <button class="btn btn-login" @click="showAuthModal = true">{{ t('login') }}</button>
+            <button class="btn btn-register" @click="showAuthModal = true">{{ t('register') }}</button>
           </template>
         </nav>
       </header>
 
       <!-- ── Hero search bar ── -->
       <div class="hero">
-        <h2 class="hero-title">Atrodiet savu universitāti</h2>
-        <p class="hero-sub">Pārlūkojiet un salīdziniet universitātes no visas pasaules</p>
+        <h2 class="hero-title">{{ t('heroTitle') }}</h2>
+        <p class="hero-sub">{{ t('heroSub') }}</p>
         <div class="hero-search">
           <svg viewBox="0 0 20 20" fill="currentColor" class="hero-search-ico">
             <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/>
@@ -120,7 +127,7 @@ async function loadUniversities() {
           <input
             v-model="search"
             @input="loadUniversities"
-            placeholder="Meklēt pēc nosaukuma, pilsētas vai valsts..."
+            :placeholder="t('searchPlaceholder')"
             class="hero-search-input"
           />
         </div>
@@ -131,10 +138,10 @@ async function loadUniversities() {
 
       <!-- ── Compare bar ── -->
       <div v-if="currentUser && compareIds.length >= 2" class="compare-bar">
-        <span><strong>{{ compareIds.length }}</strong> universitātes izvēlētas</span>
+        <span><strong>{{ compareIds.length }}</strong> {{ t('universitiesSelected') }}</span>
         <div class="compare-bar-actions">
-          <button class="btn btn-compare" @click="showCompare = true">Salīdzināt ({{ compareIds.length }})</button>
-          <button class="btn btn-compare-clear" @click="compareIds = []">Notīrīt</button>
+          <button class="btn btn-compare" @click="showCompare = true">{{ t('compare') }} ({{ compareIds.length }})</button>
+          <button class="btn btn-compare-clear" @click="compareIds = []">{{ t('clear') }}</button>
         </div>
       </div>
 
@@ -154,7 +161,7 @@ async function loadUniversities() {
       <footer class="app-footer">
         <div class="footer-left">
           <div class="footer-logo">UC</div>
-          <span><strong>UniversityCompare</strong> &mdash; Atrodiet un salīdziniet labākās universitātes pasaulē</span>
+          <span><strong>UniversityCompare</strong> &mdash; {{ t('footerTagline') }}</span>
         </div>
         <div class="footer-right">&copy; {{ new Date().getFullYear() }} UniversityCompare</div>
       </footer>
@@ -227,6 +234,26 @@ body {
 .brand-sub { display: none; }
 
 .header-nav { display: flex; align-items: center; gap: 0.5rem; }
+
+.btn-lang {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  color: rgba(255,255,255,0.45);
+  padding: 0.42rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  letter-spacing: 0.06em;
+}
+.btn-lang:hover { border-color: #555; color: rgba(255,255,255,0.65); }
+.lang-sep { color: #3a3a3a; font-size: 0.65rem; }
+.lang-active { color: white; }
 
 .btn {
   padding: 0.42rem 0.9rem;
