@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from '../api.js'
-import { t } from '../i18n.js'
+import { lang, toggleLang, t } from '../i18n.js'
 
 const emit = defineEmits(['back'])
 
@@ -201,6 +201,11 @@ onMounted(() => loadUniversities())
           <h1 class="page-title">{{ t('adminTitle') }}</h1>
           <p class="page-subtitle">{{ t('adminSubtitle') }}</p>
         </div>
+        <button class="btn-lang" @click="toggleLang" :title="lang === 'lv' ? 'Switch to English' : 'Pārslēgt uz latviešu'">
+          <span :class="{ 'lang-active': lang === 'lv' }">LV</span>
+          <span class="lang-sep">|</span>
+          <span :class="{ 'lang-active': lang === 'en' }">EN</span>
+        </button>
       </div>
     </div>
 
@@ -410,6 +415,16 @@ onMounted(() => loadUniversities())
   flex-shrink: 0;
 }
 .back-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+.btn-lang {
+  display: flex; align-items: center; gap: 5px;
+  background: transparent; border: 1px solid #3a3a3a; border-radius: 6px;
+  color: rgba(255,255,255,0.45); padding: 0.42rem 0.85rem;
+  font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: all 0.15s; letter-spacing: 0.06em; margin-left: auto;
+}
+.btn-lang:hover { border-color: #555; color: rgba(255,255,255,0.65); }
+.lang-sep { color: #3a3a3a; font-size: 0.65rem; }
+.lang-active { color: white; }
 .page-title-group { display: flex; flex-direction: column; gap: 2px; }
 .page-title { font-size: 1.15rem; font-weight: 800; color: white; letter-spacing: -0.02em; }
 .page-subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.45); }

@@ -3,26 +3,46 @@ const router = express.Router();
 const { preparedAll, preparedGet, preparedRun } = require('../db');
 const { requireAuth } = require('../middleware/auth');
 
+// GET /api/universities/filter-options
+router.get('/filter-options', (req, res) => {
+  const { country, city, search } = req.query;
+
+  // Build a subquery for universities matching the current non-program filters
+  const uniConds = [];
+  const uniParams = [];
+  if (country) { uniConds.push('country = ?'); uniParams.push(country); }
+  if (city)    { uniConds.push('location = ?'); uniParams.push(city); }
+  if (search)  { uniConds.push('(name LIKE ? OR location LIKE ? OR country LIKE ?)'); uniParams.push(`%${search}%`, `%${search}%`, `%${search}%`); }
+  const uniWhere = uniConds.length ? `WHERE ${uniConds.join(' AND ')}` : '';
+  const uniSub   = `SELECT id FROM universities ${uniWhere}`;
+
+  const cities   = preparedAll('SELECT DISTINCT location FROM universities WHERE location IS NOT NULL ORDER BY location').map(r => r.location);
+  const programs = preparedAll(`SELECT DISTINCT name FROM programs WHERE name IS NOT NULL AND university_id IN (${uniSub}) ORDER BY name`, uniParams).map(r => r.name);
+  const degrees  = preparedAll(`SELECT DISTINCT degree FROM programs WHERE degree IS NOT NULL AND university_id IN (${uniSub}) ORDER BY degree`, [...uniParams]).map(r => r.degree);
+  res.json({ cities, programs, degrees });
+});
+
 // GET /api/universities
 router.get('/', (req, res) => {
-  const { country, search } = req.query;
-  let query = 'SELECT * FROM universities';
+  const { country, city, search, program, degree } = req.query;
+  const conditions = [];
   const params = [];
 
-  if (country || search) {
-    query += ' WHERE';
-    if (country) {
-      query += ' country = ?';
-      params.push(country);
-    }
-    if (search) {
-      if (country) query += ' AND';
-      query += ' (name LIKE ? OR location LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`);
-    }
+  if (country) { conditions.push('country = ?'); params.push(country); }
+  if (city)    { conditions.push('location = ?'); params.push(city); }
+  if (search)  { conditions.push('(name LIKE ? OR location LIKE ? OR country LIKE ?)'); params.push(`%${search}%`, `%${search}%`, `%${search}%`); }
+
+  if (program || degree) {
+    const sub = [];
+    if (program) { sub.push('name LIKE ?'); params.push(`%${program}%`); }
+    if (degree)  { sub.push('degree = ?'); params.push(degree); }
+    conditions.push(`id IN (SELECT university_id FROM programs WHERE ${sub.join(' AND ')})`);
   }
 
+  let query = 'SELECT * FROM universities';
+  if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
   query += ' ORDER BY ranking ASC NULLS LAST';
+
   res.json(preparedAll(query, params));
 });
 

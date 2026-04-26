@@ -44,6 +44,10 @@ export const api = {
       const qs = new URLSearchParams(params).toString();
       return request(`/universities${qs ? '?' + qs : ''}`);
     },
+    filterOptions: (params = {}) => {
+      const qs = new URLSearchParams(params).toString();
+      return request(`/universities/filter-options${qs ? '?' + qs : ''}`);
+    },
     get: (id) => request(`/universities/${id}`),
     create: (data) => request('/universities', { method: 'POST', body: JSON.stringify(data) }),
     update: (id, data) => request(`/universities/${id}`, { method: 'PUT', body: JSON.stringify(data) }),

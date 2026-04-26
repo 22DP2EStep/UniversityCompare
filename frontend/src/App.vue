@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { api } from './api.js'
-import { lang, toggleLang, t } from './i18n.js'
+import { lang, toggleLang, t, tDegree } from './i18n.js'
 import LoginRegister from './components/LoginRegister.vue'
 import UniversityList from './components/UniversityList.vue'
 import UniversityDetail from './components/UniversityDetail.vue'
@@ -12,11 +12,19 @@ import ProfilePage from './components/ProfilePage.vue'
 const currentUser = ref(null)
 const universities = ref([])
 const selectedId = ref(null)
-const showAuthModal = ref(false)
+const authTab = ref('login')
 const search = ref('')
 const error = ref('')
+const showFilters = ref(false)
 
-// 'home' | 'admin' | 'profile'
+const filterCity = ref('')
+const filterProgram = ref('')
+const filterDegree = ref('')
+
+const filterOptions = ref({ cities: [], programs: [], degrees: [] })
+
+
+// 'home' | 'admin' | 'profile' | 'auth'
 const currentPage = ref('home')
 
 const compareIds = ref([])
@@ -31,15 +39,45 @@ function toggleCompare(id) {
   }
 }
 
-onMounted(() => {
+async function refreshFilterOptions() {
+  try {
+    const params = {}
+    if (search.value)     params.search = search.value
+    if (filterCity.value) params.city   = filterCity.value
+    const opts = await api.universities.filterOptions(params)
+    // Deduplicate programs and degrees (safety net for case/spacing variants)
+    const DEGREE_ORDER = ['Bakalaura grāds', 'Maģistra grāds', 'Doktora grāds']
+    opts.programs = [...new Set(opts.programs)]
+    opts.degrees  = [...new Set(opts.degrees)].sort(
+      (a, b) => DEGREE_ORDER.indexOf(a) - DEGREE_ORDER.indexOf(b)
+    )
+    // Reset selections if they no longer exist in the new options
+    if (filterProgram.value && !opts.programs.includes(filterProgram.value)) filterProgram.value = ''
+    if (filterDegree.value  && !opts.degrees.includes(filterDegree.value))   filterDegree.value  = ''
+    filterOptions.value = opts
+  } catch {}
+}
+
+onMounted(async () => {
   const stored = localStorage.getItem('uc_user')
   if (stored) currentUser.value = JSON.parse(stored)
   loadUniversities()
+  refreshFilterOptions()
+})
+
+// When city or search change — refresh available programs/degrees
+watch([filterCity, search], () => {
+  refreshFilterOptions()
 })
 
 function handleAuthenticated(user) {
   currentUser.value = user
-  showAuthModal.value = false
+  currentPage.value = 'home'
+}
+
+function goToAuth(tab) {
+  authTab.value = tab
+  currentPage.value = 'auth'
 }
 
 function handleLogout() {
@@ -54,12 +92,27 @@ function handleLogout() {
 async function loadUniversities() {
   try {
     const params = {}
-    if (search.value) params.search = search.value
+    if (search.value)        params.search  = search.value
+    if (filterCity.value)    params.city    = filterCity.value
+    if (filterProgram.value) params.program = filterProgram.value
+    if (filterDegree.value)  params.degree  = filterDegree.value
     universities.value = await api.universities.list(params)
   } catch (e) {
     error.value = e.message
   }
 }
+
+function clearFilters() {
+  filterCity.value = ''
+  filterProgram.value = ''
+  filterDegree.value = ''
+  loadUniversities()
+  refreshFilterOptions()
+}
+
+const activeFilterCount = computed(() =>
+  [filterCity.value, filterProgram.value, filterDegree.value].filter(Boolean).length
+)
 
 
 </script>
@@ -67,9 +120,17 @@ async function loadUniversities() {
 <template>
   <div class="app">
 
+    <!-- ══ AUTH PAGE ══ -->
+    <LoginRegister
+      v-if="currentPage === 'auth'"
+      :initialTab="authTab"
+      @authenticated="handleAuthenticated"
+      @close="currentPage = 'home'"
+    />
+
     <!-- ══ ADMIN PAGE ══ -->
     <AdminPage
-      v-if="currentPage === 'admin'"
+      v-else-if="currentPage === 'admin'"
       @back="currentPage = 'home'; loadUniversities()"
     />
 
@@ -110,8 +171,8 @@ async function loadUniversities() {
             </div>
           </template>
           <template v-else>
-            <button class="btn btn-login" @click="showAuthModal = true">{{ t('login') }}</button>
-            <button class="btn btn-register" @click="showAuthModal = true">{{ t('register') }}</button>
+            <button class="btn btn-login" @click="goToAuth('login')">{{ t('login') }}</button>
+            <button class="btn btn-register" @click="goToAuth('register')">{{ t('register') }}</button>
           </template>
         </nav>
       </header>
@@ -120,16 +181,56 @@ async function loadUniversities() {
       <div class="hero">
         <h2 class="hero-title">{{ t('heroTitle') }}</h2>
         <p class="hero-sub">{{ t('heroSub') }}</p>
-        <div class="hero-search">
-          <svg viewBox="0 0 20 20" fill="currentColor" class="hero-search-ico">
-            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/>
-          </svg>
-          <input
-            v-model="search"
-            @input="loadUniversities"
-            :placeholder="t('searchPlaceholder')"
-            class="hero-search-input"
-          />
+
+        <div class="hero-search-row">
+          <div class="hero-search">
+            <svg viewBox="0 0 20 20" fill="currentColor" class="hero-search-ico">
+              <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/>
+            </svg>
+            <input
+              v-model="search"
+              @input="loadUniversities"
+              :placeholder="t('searchPlaceholder')"
+              class="hero-search-input"
+            />
+          </div>
+          <button class="filter-toggle-btn" @click="showFilters = !showFilters" :class="{ active: showFilters || activeFilterCount > 0 }">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm2 4a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z" clip-rule="evenodd"/>
+            </svg>
+            {{ t('filters') }}
+            <span v-if="activeFilterCount > 0" class="filter-badge">{{ activeFilterCount }}</span>
+          </button>
+        </div>
+
+        <!-- Filter panel -->
+        <div v-if="showFilters" class="filter-panel">
+          <div class="filter-grid">
+            <div class="filter-field">
+              <label>{{ t('filterCity') }}</label>
+              <select v-model="filterCity" @change="loadUniversities">
+                <option value="">{{ t('filterAll') }}</option>
+                <option v-for="c in filterOptions.cities" :key="c" :value="c">{{ c }}</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>{{ t('filterProgram') }}</label>
+              <select v-model="filterProgram" @change="loadUniversities">
+                <option value="">{{ t('filterAll') }}</option>
+                <option v-for="p in filterOptions.programs" :key="p" :value="p">{{ p }}</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>{{ t('filterDegree') }}</label>
+              <select v-model="filterDegree" @change="loadUniversities">
+                <option value="">{{ t('filterAll') }}</option>
+                <option v-for="d in filterOptions.degrees" :key="d" :value="d">{{ tDegree(d) }}</option>
+              </select>
+            </div>
+          </div>
+          <button v-if="activeFilterCount > 0" class="filter-clear-btn" @click="clearFilters">
+            {{ t('clearFilters') }}
+          </button>
         </div>
       </div>
 
@@ -178,8 +279,7 @@ async function loadUniversities() {
         </div>
       </div>
 
-      <!-- ── Other modals ── -->
-      <LoginRegister v-if="showAuthModal" @authenticated="handleAuthenticated" @close="showAuthModal = false" />
+      <!-- ── Compare modal ── -->
       <CompareView v-if="showCompare" :ids="compareIds" @close="showCompare = false" />
 
     </template>
@@ -341,6 +441,104 @@ body {
 }
 .hero-search-input:focus { box-shadow: 0 4px 28px rgba(13,148,136,0.3); }
 .hero-search-input::placeholder { color: #9ca3af; }
+
+.hero-search-row {
+  display: flex;
+  gap: 0.6rem;
+  max-width: 620px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+.hero-search-row .hero-search {
+  flex: 1;
+  max-width: none;
+  margin: 0;
+}
+
+.filter-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1.1rem;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.filter-toggle-btn:hover,
+.filter-toggle-btn.active { background: rgba(255,255,255,0.25); color: white; }
+.filter-badge {
+  background: #0d9488;
+  color: white;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  line-height: 1.4;
+}
+
+.filter-panel {
+  max-width: 620px;
+  margin: 0.85rem auto 0;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 0.9rem;
+}
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+}
+@media (min-width: 540px) {
+  .filter-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.filter-field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.filter-field select {
+  padding: 0.45rem 0.6rem;
+  border-radius: 7px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.12);
+  color: white;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.filter-field select:focus { border-color: #0d9488; }
+.filter-field select option { background: #1a1a1a; color: white; }
+.filter-clear-btn {
+  margin-top: 0.75rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-clear-btn:hover { background: rgba(255,255,255,0.12); color: white; }
 
 /* ══ ERROR / COMPARE BAR ══ */
 .error-banner {

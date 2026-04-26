@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { api } from '../api.js'
-import { t } from '../i18n.js'
+import { t, tDegree } from '../i18n.js'
 
 const props = defineProps({
   id: Number,
@@ -243,7 +243,7 @@ watch(() => props.id, load, { immediate: true })
         <tbody>
           <tr v-for="p in university.programs" :key="p.id">
             <td>{{ p.name }}</td>
-            <td>{{ p.degree }}</td>
+            <td>{{ tDegree(p.degree) }}</td>
             <td>{{ p.duration_years }}{{ t('yearAbbr') }}</td>
             <td>{{ p.tuition_per_year ? `€${p.tuition_per_year.toLocaleString()}` : '—' }}</td>
             <td>{{ p.language }}</td>

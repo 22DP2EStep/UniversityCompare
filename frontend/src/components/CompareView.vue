@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from '../api.js'
-import { t } from '../i18n.js'
+import { t, tDegree } from '../i18n.js'
 
 const props = defineProps({ ids: Array })
 const emit = defineEmits(['close'])
@@ -87,7 +87,7 @@ function formatTuition(val) {
             <div v-for="p in uni.programs" :key="p.id" class="program-row">
               <div class="prog-name">{{ p.name }}</div>
               <div class="prog-meta">
-                <span class="badge badge-degree">{{ p.degree }}</span>
+                <span class="badge badge-degree">{{ tDegree(p.degree) }}</span>
                 <span>{{ p.duration_years }}{{ t('yearAbbr') }}</span>
                 <span>{{ formatTuition(p.tuition_per_year) }}/{{ t('yearAbbr') }}</span>
                 <span class="muted">{{ p.language }}</span>

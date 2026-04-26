@@ -27,6 +27,13 @@ const translations = {
     compare: 'Salīdzināt',
     clear: 'Notīrīt',
     footerTagline: 'Atrodiet un salīdziniet labākās universitātes pasaulē',
+    filters: 'Filtri',
+    filterCountry: 'Valsts',
+    filterCity: 'Pilsēta',
+    filterProgram: 'Programma',
+    filterDegree: 'Grāds',
+    filterAll: 'Visi',
+    clearFilters: 'Notīrīt filtrus',
 
     // UniversityList
     noResults: 'Nav atrasts neviens ieraksts.',
@@ -166,6 +173,13 @@ const translations = {
     compare: 'Compare',
     clear: 'Clear',
     footerTagline: 'Find and compare the best universities in the world',
+    filters: 'Filters',
+    filterCountry: 'Country',
+    filterCity: 'City',
+    filterProgram: 'Subject / Program',
+    filterDegree: 'Degree',
+    filterAll: 'All',
+    clearFilters: 'Clear filters',
 
     // UniversityList
     noResults: 'No records found.',
@@ -293,4 +307,15 @@ const translations = {
 
 export function t(key) {
   return translations[lang.value]?.[key] ?? key
+}
+
+const DEGREE_EN = {
+  'Bakalaura grāds': "Bachelor's Degree",
+  'Maģistra grāds':  "Master's Degree",
+  'Doktora grāds':   'Doctoral Degree',
+}
+
+export function tDegree(degree) {
+  if (lang.value === 'en') return DEGREE_EN[degree] ?? degree
+  return degree
 }
