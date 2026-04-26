@@ -10,8 +10,8 @@ const props = defineProps({
 const emit = defineEmits(['select', 'toggle-compare'])
 
 const COLORS = [
-  '#0d9488', '#2563eb', '#b45309', '#7c3aed',
-  '#be123c', '#0369a1', '#065f46', '#9a3412',
+  '#a83248', '#7a1f32', '#b45309', '#7c3aed',
+  '#be123c', '#6b2737', '#065f46', '#9a3412',
 ]
 function accentColor(name) {
   let hash = 0
@@ -110,7 +110,7 @@ function initials(name) {
 
 /* ── Card ── */
 .card {
-  background: #fdfcfa;
+  background: #f5f4f0;
   border-radius: 10px;
   border: 1.5px solid #e0ddd6;
   overflow: hidden;
@@ -125,8 +125,8 @@ function initials(name) {
   border-color: #b8b4aa;
 }
 .card.is-compare {
-  border-color: #0d9488;
-  box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
+  border-color: #a83248;
+  box-shadow: 0 0 0 3px rgba(168,50,72,0.15);
 }
 
 /* Banner (image or colored) */
@@ -201,7 +201,7 @@ function initials(name) {
   font-size: 0.7rem;
   font-weight: 700;
 }
-.tag-rank-lv { background: #f0fdfa; color: #0f766e; }
+.tag-rank-lv { background: #fdf0f2; color: #7a1f32; }
 .tag-rank-world { background: #fef3c7; color: #92400e; }
 
 /* CTA button */
@@ -217,14 +217,14 @@ function initials(name) {
   background: none;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #0d9488;
+  color: #a83248;
   cursor: pointer;
   font-family: inherit;
   border-top: 1px solid #ede9e2;
   width: 100%;
   transition: color 0.15s;
 }
-.card:hover .card-cta { color: #0f766e; }
+.card:hover .card-cta { color: #7a1f32; }
 
 /* Compare toggle button — floats on the banner */
 .compare-btn {
@@ -246,11 +246,11 @@ function initials(name) {
   box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 .compare-btn:hover {
-  background: white;
-  color: #0d9488;
+  background: #f5f4f0;
+  color: #a83248;
 }
 .compare-btn.active {
-  background: #0d9488;
+  background: #a83248;
   color: white;
 }
 </style>

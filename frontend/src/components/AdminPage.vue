@@ -25,6 +25,8 @@ const uniLoading = ref(false)
 const showUniForm = ref(false)
 const editingUni = ref(null)
 const uniForm = ref(emptyUniForm())
+const selectedUni = ref(null)   // full uni object for popup
+const selectedUser = ref(null)  // full user object for popup
 
 function emptyUniForm() {
   return { name: '', location: '', country: '', website: '', description: '', ranking: '', ranking_world: '', image_url: '' }
@@ -178,8 +180,27 @@ async function deleteUser(id, name) {
 function switchTab(t) {
   tab.value = t
   error.value = ''
+  selectedUni.value = null
+  selectedUser.value = null
   if (t === 'universities') loadUniversities()
   else { loadUsers(); if (!universities.value.length) loadUniversities() }
+}
+
+function editUniFromPopup() {
+  openEditUni(selectedUni.value)
+  selectedUni.value = null
+}
+
+async function deleteUniFromPopup() {
+  const uni = selectedUni.value
+  selectedUni.value = null
+  await deleteUni(uni.id, uni.name)
+}
+
+async function deleteUserFromPopup() {
+  const user = selectedUser.value
+  selectedUser.value = null
+  await deleteUser(user.id, user.name)
 }
 
 onMounted(() => loadUniversities())
@@ -385,8 +406,8 @@ onMounted(() => loadUniversities())
 
 /* Page header */
 .page-header {
-  background: #1a1a1a;
-  border-bottom: 3px solid #0d9488;
+  background: #0f172a;
+  border-bottom: 3px solid #a83248;
   padding: 1.25rem 2rem;
   flex-shrink: 0;
 }
@@ -465,8 +486,8 @@ onMounted(() => loadUniversities())
 }
 .atab:hover { color: #444; }
 .atab.active {
-  color: #0d9488;
-  border-bottom-color: #0d9488;
+  color: #a83248;
+  border-bottom-color: #a83248;
   background: #fdfcfa;
 }
 
@@ -493,14 +514,14 @@ onMounted(() => loadUniversities())
 
 /* Inline form */
 .inline-form {
-  background: white;
+  background: #f5f4f0;
   border: 1px solid #d4d0c8;
-  border-top: 3px solid #0d9488;
+  border-top: 3px solid #a83248;
   border-radius: 8px;
   padding: 1.1rem 1.25rem;
   margin-bottom: 1.25rem;
 }
-.inline-form h3 { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #0d9488; margin-bottom: 0.85rem; }
+.inline-form h3 { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #a83248; margin-bottom: 0.85rem; }
 .uni-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -528,9 +549,9 @@ onMounted(() => loadUniversities())
   font-weight: 400;
 }
 .uni-grid input:focus, .uni-grid textarea:focus {
-  border-color: #0d9488;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+  border-color: #a83248;
+  background: #f5f4f0;
+  box-shadow: 0 0 0 3px rgba(168,50,72,0.12);
 }
 .span2 { grid-column: span 2; }
 .form-actions { display: flex; gap: 0.5rem; }
@@ -560,12 +581,27 @@ onMounted(() => loadUniversities())
   padding: 0.65rem 0.9rem;
   border-top: 1px solid #ede9e2;
   vertical-align: middle;
-  background: white;
+  background: #f5f4f0;
 }
 .data-table tr:hover td { background: #f9f8f5; }
 .bold { font-weight: 600; }
 .muted { color: #999; font-size: 0.8rem; }
 .actions { display: flex; gap: 0.4rem; white-space: nowrap; }
+
+.action-popup {
+  background: #fdfcfa;
+  border-radius: 10px;
+  padding: 1.75rem 2rem 1.5rem;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  border: 1px solid #d4d0c8;
+  border-top: 4px solid #a83248;
+  text-align: center;
+}
+.popup-name { font-size: 1.05rem; font-weight: 800; color: #1a1a1a; margin: 0 0 0.25rem; }
+.popup-sub { font-size: 0.82rem; color: #999; margin: 0 0 1.5rem; }
+.popup-actions { display: flex; gap: 0.65rem; justify-content: center; }
 
 /* Buttons */
 .btn {
@@ -578,12 +614,12 @@ onMounted(() => loadUniversities())
   font-family: inherit;
   transition: all 0.15s;
 }
-.btn-primary { background: #0d9488; color: white; }
-.btn-primary:hover { background: #0f766e; }
+.btn-primary { background: #a83248; color: white; }
+.btn-primary:hover { background: #7a1f32; }
 .btn-secondary { background: #f5f4f0; color: #444; border: 1px solid #d4d0c8; }
 .btn-secondary:hover { background: #e8e5dd; }
-.btn-edit { background: #f0fdfa; color: #0d9488; border: 1px solid #99f6e4; }
-.btn-edit:hover { background: #ccfbf1; }
+.btn-edit { background: #1e3a5f; color: #f5f4f0; border: 1px solid #1e3a5f; }
+.btn-edit:hover { background: #264a74; }
 .btn-danger { background: #b91c1c; color: white; }
 .btn-danger:hover { background: #991b1b; }
 .btn-sm { padding: 0.22rem 0.55rem; font-size: 0.78rem; }
@@ -598,7 +634,7 @@ onMounted(() => loadUniversities())
   font-family: inherit;
   background: #f5f4f0;
 }
-.role-admin { background: #f0fdfa; color: #0f766e; border-color: #99f6e4; font-weight: 700; }
+.role-admin { background: #fdf0f2; color: #7a1f32; border-color: #f8d4d8; font-weight: 700; }
 .role-user { background: #f5f4f0; color: #555; }
 .role-expert { background: #fef3c7; color: #92400e; border-color: #fcd34d; font-weight: 700; }
 

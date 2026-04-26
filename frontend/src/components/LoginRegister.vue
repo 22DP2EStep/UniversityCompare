@@ -62,7 +62,11 @@ async function handleRegister() {
     <!-- Header -->
     <header class="app-header">
       <div class="header-brand">
-        <div class="brand-logo">UC</div>
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17">
+            <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+          </svg>
+        </div>
         <div class="brand-name">UniversityCompare</div>
       </div>
       <nav class="header-nav">
@@ -79,7 +83,11 @@ async function handleRegister() {
     <div class="auth-content">
       <div class="auth-card">
         <div class="auth-logo">
-          <div class="auth-logo-icon">UC</div>
+          <div class="auth-logo-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+              <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+            </svg>
+          </div>
           <h1>UniversityCompare</h1>
           <p>{{ t('authTagline') }}</p>
         </div>
@@ -136,7 +144,11 @@ async function handleRegister() {
     <!-- Footer -->
     <footer class="app-footer">
       <div class="footer-left">
-        <div class="footer-logo">UC</div>
+        <div class="footer-logo">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+            <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+          </svg>
+        </div>
         <span><strong>UniversityCompare</strong></span>
       </div>
       <div class="footer-right">&copy; {{ new Date().getFullYear() }} UniversityCompare</div>
@@ -168,7 +180,7 @@ async function handleRegister() {
 .brand-logo {
   width: 32px; height: 32px;
   border-radius: 6px;
-  background: #0d9488;
+  background: #a83248;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.72rem; font-weight: 800; color: white; letter-spacing: -0.03em;
   flex-shrink: 0;
@@ -199,13 +211,13 @@ async function handleRegister() {
 }
 
 .auth-card {
-  background: white;
+  background: #f5f4f0;
   border-radius: 12px;
   padding: 2rem;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-  border-top: 3px solid #0d9488;
+  border-top: 3px solid #a83248;
 }
 
 .auth-logo {
@@ -214,7 +226,7 @@ async function handleRegister() {
 }
 .auth-logo-icon {
   width: 44px; height: 44px; border-radius: 10px;
-  background: #0d9488;
+  background: #a83248;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.85rem; font-weight: 800; color: white; letter-spacing: -0.03em;
   margin: 0 auto 0.75rem;
@@ -243,7 +255,7 @@ async function handleRegister() {
 .footer-left strong { color: rgba(255,255,255,0.55); }
 .footer-logo {
   width: 22px; height: 22px; border-radius: 4px;
-  background: #0d9488;
+  background: #a83248;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.52rem; font-weight: 800; color: white; flex-shrink: 0;
 }
@@ -269,7 +281,7 @@ async function handleRegister() {
   transition: background 0.2s, color 0.2s;
 }
 .tab-btn.active {
-  background: #0d9488;
+  background: #a83248;
   color: white;
 }
 
@@ -309,13 +321,13 @@ async function handleRegister() {
   transition: border-color 0.2s;
 }
 .field input:focus {
-  border-color: #0d9488;
-  box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
+  border-color: #a83248;
+  box-shadow: 0 0 0 3px rgba(168,50,72,0.15);
 }
 
 .submit-btn {
   padding: 0.7rem;
-  background: #0d9488;
+  background: #a83248;
   color: white;
   border: none;
   border-radius: 6px;
@@ -327,7 +339,7 @@ async function handleRegister() {
   transition: background 0.2s;
 }
 .submit-btn:hover:not(:disabled) {
-  background: #0f766e;
+  background: #7a1f32;
 }
 .submit-btn:disabled {
   opacity: 0.6;
@@ -340,7 +352,7 @@ async function handleRegister() {
   color: #666;
 }
 .switch-hint span {
-  color: #0d9488;
+  color: #a83248;
   cursor: pointer;
   font-weight: 500;
   text-decoration: underline;

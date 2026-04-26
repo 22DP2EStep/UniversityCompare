@@ -36,7 +36,10 @@ function formatTuition(val) {
           <h2>{{ t('compareTitle') }}</h2>
           <p class="compare-sub">{{ ids.length }} {{ t('universitiesSelected') }}</p>
         </div>
-        <button class="close-btn" @click="emit('close')">&#10005;</button>
+        <div class="header-actions">
+          <button class="back-btn" @click="emit('close')">&#8592; {{ t('back') }}</button>
+          <button class="close-btn" @click="emit('close')">&#10005;</button>
+        </div>
       </div>
 
       <div v-if="loading" class="state-msg">{{ t('loading') }}</div>
@@ -116,7 +119,7 @@ function formatTuition(val) {
 }
 
 .compare-panel {
-  background: #fdfcfa;
+  background: #d9d4c7;
   border-radius: 10px;
   width: 100%;
   max-width: 1100px;
@@ -132,13 +135,32 @@ function formatTuition(val) {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: #1a1a1a;
+  background: #0f172a;
   color: white;
   flex-shrink: 0;
-  border-bottom: 3px solid #0d9488;
+  border-bottom: 3px solid #a83248;
 }
 .compare-header h2 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
 .compare-sub { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.back-btn {
+  background: rgba(168,50,72,0.15);
+  border: 1px solid rgba(168,50,72,0.4);
+  color: #c87888;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.back-btn:hover { background: rgba(168,50,72,0.28); }
 
 .close-btn {
   background: rgba(255,255,255,0.08);
@@ -186,9 +208,9 @@ function formatTuition(val) {
 
 /* University name header */
 .uni-header {
-  background: #f0fdfa;
+  background: #fdf0f2;
 }
-.uni-title { font-size: 0.925rem; font-weight: 700; color: #0d9488; line-height: 1.3; }
+.uni-title { font-size: 0.925rem; font-weight: 700; color: #a83248; line-height: 1.3; }
 .uni-sub { font-size: 0.75rem; color: #888; margin-top: 3px; }
 
 /* Row labels */
@@ -210,24 +232,24 @@ function formatTuition(val) {
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 700;
-  background: #f0fdfa;
-  color: #0d9488;
+  background: #fdf0f2;
+  color: #a83248;
 }
 .badge-rank { background: #fef3c7; color: #92400e; }
-.badge-rank-lv { background: #f0fdfa; color: #0f766e; }
-.badge-degree { background: #f0fdfa; color: #0d9488; }
+.badge-rank-lv { background: #fdf0f2; color: #7a1f32; }
+.badge-degree { background: #fdf0f2; color: #a83248; }
 
 .muted { color: #aaa; font-size: 0.82rem; }
 .desc { color: #555; font-size: 0.82rem; line-height: 1.55; }
 
-.website-link { color: #0d9488; font-size: 0.82rem; text-decoration: none; font-weight: 600; }
+.website-link { color: #a83248; font-size: 0.82rem; text-decoration: none; font-weight: 600; }
 .website-link:hover { text-decoration: underline; }
 
 /* Programs */
 .programs-cell { display: flex; flex-direction: column; gap: 0.6rem; }
 .program-row {
   padding: 0.5rem 0.65rem;
-  background: white;
+  background: #f5f4f0;
   border-radius: 6px;
   border: 1px solid #ede9e2;
 }

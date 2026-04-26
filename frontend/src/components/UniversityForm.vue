@@ -60,7 +60,7 @@ function submit() {
   z-index: 100;
 }
 .modal {
-  background: white;
+  background: #f5f4f0;
   border-radius: 10px;
   padding: 1.5rem;
   width: 480px;

@@ -286,7 +286,7 @@ watch(() => props.id, load, { immediate: true })
 .detail {
   flex: 1;
   overflow-y: auto;
-  background: white;
+  background: #f5f4f0;
   max-height: 85vh;
 }
 .detail-image-banner {
@@ -320,10 +320,10 @@ watch(() => props.id, load, { immediate: true })
   padding: 2px 8px; border-radius: 10px;
   font-size: 0.75rem; font-weight: 700;
 }
-.rank-lv { background: #f0fdfa; color: #0f766e; }
+.rank-lv { background: #fdf0f2; color: #7a1f32; }
 .rank-world { background: #fef3c7; color: #92400e; }
 
-.website-link { font-size: 0.85rem; color: #0d9488; text-decoration: none; }
+.website-link { font-size: 0.85rem; color: #a83248; text-decoration: none; }
 .website-link:hover { text-decoration: underline; }
 
 /* Edit section */
@@ -331,7 +331,7 @@ watch(() => props.id, load, { immediate: true })
   margin: 1.5rem 2rem 0;
   background: #f9f8f5;
   border: 1px solid #d4d0c8;
-  border-top: 3px solid #0d9488;
+  border-top: 3px solid #a83248;
   border-radius: 8px;
   padding: 1.1rem 1.25rem 1.25rem;
 }
@@ -340,7 +340,7 @@ watch(() => props.id, load, { immediate: true })
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #0d9488;
+  color: #a83248;
   margin-bottom: 0.9rem;
 }
 .edit-grid {
@@ -365,14 +365,14 @@ watch(() => props.id, load, { immediate: true })
   border-radius: 5px;
   font-size: 0.875rem;
   font-family: inherit;
-  background: white;
+  background: #f5f4f0;
   outline: none;
   font-weight: 400;
   transition: border-color 0.15s;
 }
 .edit-input:focus {
-  border-color: #0d9488;
-  box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+  border-color: #a83248;
+  box-shadow: 0 0 0 3px rgba(168,50,72,0.12);
 }
 textarea.edit-input { resize: vertical; }
 .edit-actions { display: flex; gap: 0.5rem; margin-top: 0.85rem; }
@@ -381,7 +381,7 @@ textarea.edit-input { resize: vertical; }
 .prog-form {
   background: #f9f8f5;
   border: 1px solid #d4d0c8;
-  border-top: 3px solid #2563eb;
+  border-top: 3px solid #a83248;
   border-radius: 8px;
   padding: 1rem 1.1rem 1.1rem;
   margin-bottom: 1rem;
@@ -431,7 +431,7 @@ textarea.edit-input { resize: vertical; }
   padding: 0.6rem 0.75rem;
   font-size: 0.875rem;
   border-top: 1px solid #ede9e2;
-  background: white;
+  background: #f5f4f0;
   color: #1a1a1a;
 }
 .programs-table tr:hover td { background: #f9f8f5; }
@@ -483,13 +483,13 @@ textarea.edit-input { resize: vertical; }
 }
 .btn-secondary { background: #f5f4f0; color: #444; border: 1px solid #d4d0c8; }
 .btn-secondary:hover { background: #e8e5dd; }
-.btn-primary { background: #0d9488; color: white; }
-.btn-primary:hover { background: #0f766e; }
+.btn-primary { background: #a83248; color: white; }
+.btn-primary:hover { background: #7a1f32; }
 .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
-.btn-edit-uni { background: #f0fdfa; color: #0d9488; border: 1px solid #99f6e4; font-size: 0.82rem; }
-.btn-edit-uni:hover { background: #ccfbf1; }
-.btn-add-prog { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; font-size: 0.8rem; padding: 0.3rem 0.7rem; }
-.btn-add-prog:hover { background: #dbeafe; }
+.btn-edit-uni { background: #fdf0f2; color: #a83248; border: 1px solid #f8d4d8; font-size: 0.82rem; }
+.btn-edit-uni:hover { background: #f8d4d8; }
+.btn-add-prog { background: #fdf0f2; color: #a83248; border: 1px solid #f8d4d8; font-size: 0.8rem; padding: 0.3rem 0.7rem; }
+.btn-add-prog:hover { background: #f8d4d8; }
 .btn-del-prog {
   background: none;
   border: none;

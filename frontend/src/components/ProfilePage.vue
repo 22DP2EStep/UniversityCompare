@@ -15,8 +15,8 @@ const nameForm = ref({ name: props.user.name })
 const passForm = ref({ current: '', newPass: '', confirm: '' })
 
 const ROLE_LABELS = computed(() => ({ user: t('roleUser'), expert: t('roleExpert'), admin: t('roleAdmin') }))
-const ROLE_COLORS = { user: '#555', expert: '#92400e', admin: '#0f766e' }
-const ROLE_BG    = { user: '#f5f4f0', expert: '#fef3c7', admin: '#f0fdfa' }
+const ROLE_COLORS = { user: '#555', expert: '#92400e', admin: '#7a1f32' }
+const ROLE_BG    = { user: '#f5f4f0', expert: '#fef3c7', admin: '#fdf0f2' }
 
 function initials(name) {
   return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
@@ -197,8 +197,8 @@ function switchTab(t) {
 
 /* Page header */
 .page-header {
-  background: #1a1a1a;
-  border-bottom: 3px solid #0d9488;
+  background: #0f172a;
+  border-bottom: 3px solid #a83248;
   padding: 1.25rem 2rem;
   flex-shrink: 0;
 }
@@ -264,7 +264,7 @@ function switchTab(t) {
   align-items: center;
   gap: 1rem;
   padding: 1.25rem 1.5rem;
-  background: white;
+  background: #f5f4f0;
   border-bottom: 1px solid #e8e5dd;
   flex-wrap: wrap;
 }
@@ -272,7 +272,7 @@ function switchTab(t) {
   width: 52px;
   height: 52px;
   border-radius: 12px;
-  background: #0d9488;
+  background: #a83248;
   color: white;
   display: flex;
   align-items: center;
@@ -316,8 +316,8 @@ function switchTab(t) {
 }
 .ptab:hover { color: #444; }
 .ptab.active {
-  color: #0d9488;
-  border-bottom-color: #0d9488;
+  color: #a83248;
+  border-bottom-color: #a83248;
   background: #fdfcfa;
 }
 
@@ -328,7 +328,7 @@ function switchTab(t) {
   border-bottom: 1px solid;
 }
 .msg-error { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
-.msg-success { background: #f0fdfa; color: #0f766e; border-color: #99f6e4; }
+.msg-success { background: #fdf0f2; color: #7a1f32; border-color: #f8d4d8; }
 
 /* Tab content */
 .tab-content { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
@@ -360,9 +360,9 @@ function switchTab(t) {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .field-input:focus {
-  border-color: #0d9488;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+  border-color: #a83248;
+  background: #f5f4f0;
+  box-shadow: 0 0 0 3px rgba(168,50,72,0.12);
 }
 
 .info-grid { display: flex; flex-direction: column; border: 1px solid #d4d0c8; border-radius: 7px; overflow: hidden; }
@@ -371,7 +371,7 @@ function switchTab(t) {
   align-items: center;
   justify-content: space-between;
   padding: 0.65rem 1rem;
-  background: white;
+  background: #f5f4f0;
   border-top: 1px solid #ede9e2;
   gap: 1rem;
 }
@@ -402,8 +402,8 @@ function switchTab(t) {
   transition: all 0.15s;
   white-space: nowrap;
 }
-.btn-primary { background: #0d9488; color: white; }
-.btn-primary:hover { background: #0f766e; }
+.btn-primary { background: #a83248; color: white; }
+.btn-primary:hover { background: #7a1f32; }
 .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 .btn-full { width: 100%; justify-content: center; padding: 0.6rem; }
 </style>

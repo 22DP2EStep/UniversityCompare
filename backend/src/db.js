@@ -23,9 +23,33 @@ async function init() {
 
   db.run(`PRAGMA foreign_keys = ON;`);
 
+  // ── Table definitions ────────────────────────────────────────
+  db.run(`
+    CREATE TABLE IF NOT EXISTS locations (
+      id      INTEGER PRIMARY KEY AUTOINCREMENT,
+      city    TEXT NOT NULL,
+      country TEXT NOT NULL DEFAULT 'Latvija',
+      UNIQUE(city, country)
+    );
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS reviews (
+      id            INTEGER PRIMARY KEY AUTOINCREMENT,
+      university_id INTEGER NOT NULL,
+      user_id       INTEGER NOT NULL,
+      rating        INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
+      comment       TEXT,
+      created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (university_id) REFERENCES universities(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id)       REFERENCES users(id)       ON DELETE CASCADE
+    );
+  `);
+
   // Migrations
   try { db.run('ALTER TABLE universities ADD COLUMN ranking_world INTEGER'); } catch (_) {}
   try { db.run('ALTER TABLE universities ADD COLUMN image_url TEXT'); } catch (_) {}
+  try { db.run('ALTER TABLE universities ADD COLUMN location_id INTEGER'); } catch (_) {}
   db.run("UPDATE programs SET degree = 'Bakalaura grāds' WHERE degree IN ('Bakalaura grāds','BSc','BA','BEng','LLB')");
   db.run("UPDATE programs SET degree = 'Maģistra grāds'  WHERE degree IN ('Maģistrs','MSc','MA','MBA','MEng','LLM')");
   db.run("UPDATE programs SET degree = 'Doktora grāds'   WHERE degree IN ('Doktora grāds','MD','DDS','PhD')");
@@ -313,6 +337,19 @@ async function init() {
 
     save();
   }
+
+  // Populate locations table from existing universities data and link via location_id
+  try {
+    const unis = preparedAll('SELECT id, location, country FROM universities WHERE location IS NOT NULL AND location_id IS NULL');
+    if (unis.length) {
+      for (const uni of unis) {
+        db.run('INSERT OR IGNORE INTO locations (city, country) VALUES (?, ?)', [uni.location, uni.country]);
+        const loc = preparedGet('SELECT id FROM locations WHERE city = ? AND country = ?', [uni.location, uni.country]);
+        if (loc) db.run('UPDATE universities SET location_id = ? WHERE id = ?', [loc.id, uni.id]);
+      }
+      save();
+    }
+  } catch (_) {}
 
   return db;
 }

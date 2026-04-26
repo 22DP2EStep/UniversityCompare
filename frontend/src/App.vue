@@ -8,6 +8,7 @@ import UniversityDetail from './components/UniversityDetail.vue'
 import AdminPage from './components/AdminPage.vue'
 import CompareView from './components/CompareView.vue'
 import ProfilePage from './components/ProfilePage.vue'
+import LandingPage from './components/LandingPage.vue'
 
 const currentUser = ref(null)
 const universities = ref([])
@@ -24,8 +25,8 @@ const filterDegree = ref('')
 const filterOptions = ref({ cities: [], programs: [], degrees: [] })
 
 
-// 'home' | 'admin' | 'profile' | 'auth'
-const currentPage = ref('home')
+// 'landing' | 'home' | 'admin' | 'profile' | 'auth'
+const currentPage = ref('landing')
 
 const compareIds = ref([])
 const showCompare = ref(false)
@@ -120,9 +121,20 @@ const activeFilterCount = computed(() =>
 <template>
   <div class="app">
 
+    <!-- ══ LANDING PAGE ══ -->
+    <LandingPage
+      v-if="currentPage === 'landing'"
+      :currentUser="currentUser"
+      @go-to-app="currentPage = 'home'"
+      @go-to-auth="tab => { authTab = tab; currentPage = 'auth' }"
+      @go-to-admin="currentPage = 'admin'"
+      @go-to-profile="currentPage = 'profile'"
+      @logout="handleLogout"
+    />
+
     <!-- ══ AUTH PAGE ══ -->
     <LoginRegister
-      v-if="currentPage === 'auth'"
+      v-else-if="currentPage === 'auth'"
       :initialTab="authTab"
       @authenticated="handleAuthenticated"
       @close="currentPage = 'home'"
@@ -147,8 +159,12 @@ const activeFilterCount = computed(() =>
 
       <!-- ── Header ── -->
       <header class="app-header">
-        <div class="header-brand">
-          <div class="brand-logo">UC</div>
+        <div class="header-brand" @click="currentPage = 'landing'" style="cursor:pointer">
+          <div class="brand-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17">
+              <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+            </svg>
+          </div>
           <div>
             <div class="brand-name">UniversityCompare</div>
             <div class="brand-sub">{{ t('brandSub') }}</div>
@@ -156,6 +172,7 @@ const activeFilterCount = computed(() =>
         </div>
 
         <nav class="header-nav">
+          <button class="btn btn-back-home" @click="currentPage = 'landing'">{{ t('backHome') }}</button>
           <button class="btn-lang" @click="toggleLang" :title="lang === 'lv' ? 'Switch to English' : 'Pārslēgt uz latviešu'">
             <span :class="{ 'lang-active': lang === 'lv' }">LV</span>
             <span class="lang-sep">|</span>
@@ -163,9 +180,13 @@ const activeFilterCount = computed(() =>
           </button>
 
           <template v-if="currentUser">
-            <button v-if="currentUser.role === 'admin'" class="btn btn-admin" @click="currentPage = 'admin'">&#9881; {{ t('adminBtn') }}</button>
+            <button v-if="currentUser.role === 'admin'" class="btn btn-admin" @click="currentPage = 'admin'">{{ t('adminBtn') }}</button>
             <div class="user-menu">
-              <div class="user-avatar" @click="currentPage = 'profile'" :title="t('viewProfile')">{{ currentUser.name.charAt(0).toUpperCase() }}</div>
+              <div class="user-avatar" @click="currentPage = 'profile'" :title="t('viewProfile')">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v1h16v-1c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
               <span class="user-name" @click="currentPage = 'profile'" style="cursor:pointer">{{ currentUser.name }}</span>
               <button class="btn btn-logout" @click="handleLogout">{{ t('logout') }}</button>
             </div>
@@ -247,6 +268,7 @@ const activeFilterCount = computed(() =>
       </div>
 
       <!-- ── Card grid ── -->
+      <div class="main-bg">
       <main class="main-content">
         <UniversityList
           :universities="universities"
@@ -257,11 +279,16 @@ const activeFilterCount = computed(() =>
           @toggle-compare="toggleCompare"
         />
       </main>
+      </div>
 
       <!-- ── Footer ── -->
       <footer class="app-footer">
         <div class="footer-left">
-          <div class="footer-logo">UC</div>
+          <div class="footer-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+              <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+            </svg>
+          </div>
           <span><strong>UniversityCompare</strong> &mdash; {{ t('footerTagline') }}</span>
         </div>
         <div class="footer-right">&copy; {{ new Date().getFullYear() }} UniversityCompare</div>
@@ -289,7 +316,7 @@ const activeFilterCount = computed(() =>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Roboto', system-ui, -apple-system, sans-serif;
   background: #f5f4f0;
   color: #1a1a1a;
   -webkit-font-smoothing: antialiased;
@@ -308,19 +335,21 @@ body {
   justify-content: space-between;
   padding: 0 2rem;
   height: 58px;
-  background: #1a1a1a;
+  background: #0f172a;
   color: white;
   flex-shrink: 0;
   border-bottom: 1px solid #2e2e2e;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 50;
 }
 .header-brand { display: flex; align-items: center; gap: 0.75rem; }
 .brand-logo {
   width: 32px; height: 32px;
   border-radius: 6px;
-  background: #0d9488;
+  background: #a83248;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.72rem; font-weight: 800; color: white; letter-spacing: -0.03em;
   flex-shrink: 0;
@@ -343,8 +372,8 @@ body {
   border: 1px solid #3a3a3a;
   border-radius: 6px;
   color: rgba(255,255,255,0.45);
-  padding: 0.42rem 0.85rem;
-  font-size: 0.82rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
@@ -361,18 +390,20 @@ body {
   cursor: pointer; font-size: 0.85rem; font-weight: 600;
   font-family: inherit; transition: all 0.15s; white-space: nowrap;
 }
-.btn-add { background: #0d9488; color: white; }
-.btn-add:hover { background: #0f766e; }
-.btn-admin { background: #92400e; color: white; }
-.btn-admin:hover { background: #78350f; }
-.btn-login { background: transparent; color: rgba(255,255,255,0.7); border: 1px solid #3a3a3a; }
-.btn-login:hover { background: #2a2a2a; color: white; }
-.btn-register { background: #0d9488; color: white; }
-.btn-register:hover { background: #0f766e; }
-.btn-logout { background: transparent; color: rgba(255,255,255,0.5); border: 1px solid #2e2e2e; font-size: 0.78rem; padding: 0.3rem 0.65rem; }
-.btn-logout:hover { background: #2a2a2a; color: white; }
-.btn-primary { background: #0d9488; color: white; }
-.btn-primary:hover { background: #0f766e; }
+.btn-add { background: #a83248; color: white; }
+.btn-add:hover { background: #7a1f32; }
+.btn-admin { background: none; color: rgba(255,255,255,0.8); border: none; font-size: 0.95rem; padding: 0.25rem 0.5rem; }
+.btn-admin:hover { color: white; background: none; }
+.btn-login { background: none; color: rgba(255,255,255,0.8); border: none; font-size: 0.95rem; padding: 0.25rem 0.5rem; }
+.btn-login:hover { color: white; background: none; }
+.btn-register { background: none; color: rgba(255,255,255,0.8); border: none; font-size: 0.95rem; padding: 0.25rem 0.5rem; }
+.btn-register:hover { color: white; background: none; }
+.btn-logout { background: #a83248; color: white; border: none; font-size: 0.95rem; padding: 0.5rem 1.1rem; }
+.btn-logout:hover { background: #7a1f32; color: white; }
+.btn-back-home { background: none; color: rgba(255,255,255,0.8); border: none; font-size: 0.95rem; padding: 0.25rem 0.5rem; }
+.btn-back-home:hover { color: white; background: none; }
+.btn-primary { background: #a83248; color: white; }
+.btn-primary:hover { background: #7a1f32; }
 .btn-secondary { background: #f5f4f0; color: #444; border: 1px solid #d4d0c8; }
 .btn-secondary:hover { background: #e8e5dd; }
 .btn-danger { background: #b91c1c; color: white; }
@@ -385,21 +416,22 @@ body {
   margin-left: 0.25rem;
 }
 .user-avatar {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: #0d9488;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #64748b;
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.72rem; font-weight: 700; color: white; flex-shrink: 0;
+  color: white; flex-shrink: 0;
   cursor: pointer;
 }
-.user-name { font-size: 0.82rem; color: rgba(255,255,255,0.8); font-weight: 500; }
+.user-name { font-size: 0.95rem; color: rgba(255,255,255,0.8); font-weight: 500; }
 
 /* ══ HERO ══ */
 .hero {
-  background: #1a1a1a;
+  background: #0f172a;
   padding: 3.5rem 2rem 3rem;
+  margin-top: 58px;
   text-align: center;
   color: white;
-  border-bottom: 3px solid #0d9488;
+  border-bottom: 3px solid #a83248;
 }
 .hero-title {
   font-size: 2rem;
@@ -433,13 +465,13 @@ body {
   border: none;
   font-size: 1rem;
   font-family: inherit;
-  background: white;
+  background: #f5f4f0;
   color: #0f172a;
   outline: none;
   box-shadow: 0 4px 24px rgba(0,0,0,0.25);
   transition: box-shadow 0.2s;
 }
-.hero-search-input:focus { box-shadow: 0 4px 28px rgba(13,148,136,0.3); }
+.hero-search-input:focus { box-shadow: 0 4px 28px rgba(168,50,72,0.3); }
 .hero-search-input::placeholder { color: #9ca3af; }
 
 .hero-search-row {
@@ -459,23 +491,23 @@ body {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0 1.1rem;
+  padding: 0.25rem 0.5rem;
   border: none;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.85);
+  border-radius: 0;
+  background: none;
+  color: rgba(255,255,255,0.8);
   font-size: 0.88rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  transition: color 0.15s;
   flex-shrink: 0;
 }
 .filter-toggle-btn:hover,
-.filter-toggle-btn.active { background: rgba(255,255,255,0.25); color: white; }
+.filter-toggle-btn.active { background: none; color: white; }
 .filter-badge {
-  background: #0d9488;
+  background: #a83248;
   color: white;
   border-radius: 999px;
   font-size: 0.7rem;
@@ -487,8 +519,8 @@ body {
 .filter-panel {
   max-width: 620px;
   margin: 0.85rem auto 0;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: #f5f4f0;
+  border: 1px solid #e0ddd6;
   border-radius: 12px;
   padding: 1rem 1.1rem 0.9rem;
 }
@@ -508,7 +540,7 @@ body {
 .filter-field label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.6);
+  color: #5a5348;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -516,7 +548,7 @@ body {
   padding: 0.45rem 0.6rem;
   border-radius: 7px;
   border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.12);
+  background: #a83248;
   color: white;
   font-size: 0.85rem;
   font-family: inherit;
@@ -524,21 +556,21 @@ body {
   cursor: pointer;
   transition: border-color 0.15s;
 }
-.filter-field select:focus { border-color: #0d9488; }
-.filter-field select option { background: #1a1a1a; color: white; }
+.filter-field select:focus { border-color: #7a1f32; }
+.filter-field select option { background: #7a1f32; color: white; }
 .filter-clear-btn {
   margin-top: 0.75rem;
   padding: 0.35rem 0.85rem;
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(0,0,0,0.18);
   border-radius: 6px;
   background: transparent;
-  color: rgba(255,255,255,0.7);
+  color: #3a3a3a;
   font-size: 0.8rem;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.15s;
 }
-.filter-clear-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+.filter-clear-btn:hover { background: rgba(0,0,0,0.08); color: #1a1a1a; }
 
 /* ══ ERROR / COMPARE BAR ══ */
 .error-banner {
@@ -549,25 +581,29 @@ body {
 .compare-bar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.6rem 2rem;
-  background: #134e4a;
-  color: white; font-size: 0.85rem;
+  background: #e8e5dd;
+  color: #1a1a1a; font-size: 0.85rem;
 }
 .compare-bar strong { font-weight: 800; }
 .compare-bar-actions { display: flex; gap: 0.5rem; }
 .btn-compare {
-  background: #0d9488; color: white;
+  background: #a83248; color: white;
   font-weight: 700; border: none; border-radius: 6px;
   padding: 0.38rem 0.85rem; font-size: 0.85rem; cursor: pointer; font-family: inherit;
 }
-.btn-compare:hover { background: #0f766e; }
+.btn-compare:hover { background: #7a1f32; }
 .btn-compare-clear {
-  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);
-  border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+  background: rgba(0,0,0,0.07); color: #3a3a3a;
+  border: 1px solid rgba(0,0,0,0.15); border-radius: 6px;
   padding: 0.38rem 0.75rem; font-size: 0.82rem; cursor: pointer; font-family: inherit;
 }
-.btn-compare-clear:hover { background: rgba(255,255,255,0.18); }
+.btn-compare-clear:hover { background: rgba(0,0,0,0.13); }
 
 /* ══ MAIN CONTENT ══ */
+.main-bg {
+  background: #d9d4c7;
+  flex: 1;
+}
 .main-content {
   flex: 1;
   padding: 2rem;
@@ -580,7 +616,7 @@ body {
 .app-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.8rem 2rem;
-  background: #1a1a1a;
+  background: #0f172a;
   border-top: 1px solid #2e2e2e;
   flex-shrink: 0;
 }
@@ -588,7 +624,7 @@ body {
 .footer-left strong { color: rgba(255,255,255,0.55); }
 .footer-logo {
   width: 22px; height: 22px; border-radius: 4px;
-  background: #0d9488;
+  background: #a83248;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.52rem; font-weight: 800; color: white;
   flex-shrink: 0;
@@ -608,7 +644,7 @@ body {
   overflow-y: auto;
 }
 .detail-modal {
-  background: white;
+  background: #f5f4f0;
   border-radius: 12px;
   width: 100%;
   max-width: 860px;
