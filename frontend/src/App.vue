@@ -71,6 +71,10 @@ watch([filterCity, search], () => {
   refreshFilterOptions()
 })
 
+watch(selectedId, (id) => {
+  document.body.style.overflow = id ? 'hidden' : ''
+})
+
 function handleAuthenticated(user) {
   currentUser.value = user
   currentPage.value = 'home'
