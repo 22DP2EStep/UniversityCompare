@@ -7,6 +7,16 @@ const { requireAuth } = require('../middleware/auth');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
 
+const USER_SELECT = `
+  SELECT id,
+         vards           AS name,
+         epasts          AS email,
+         loma            AS role,
+         eksperta_uni_id AS expert_university_id,
+         izveidots       AS created_at
+  FROM lietotaji
+`;
+
 function makeToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, name: user.name, role: user.role, expert_university_id: user.expert_university_id ?? null },
@@ -20,8 +30,8 @@ router.put('/name', requireAuth, (req, res) => {
   if (!name || !name.trim()) {
     return res.status(400).json({ error: 'Vārds ir obligāts.' });
   }
-  preparedRun('UPDATE users SET name = ? WHERE id = ?', [name.trim(), req.user.id]);
-  const user = preparedGet('SELECT id, name, email, role, expert_university_id, created_at FROM users WHERE id = ?', [req.user.id]);
+  preparedRun('UPDATE lietotaji SET vards = ? WHERE id = ?', [name.trim(), req.user.id]);
+  const user = preparedGet(USER_SELECT + ' WHERE id = ?', [req.user.id]);
   res.json({ token: makeToken(user), user });
 });
 
@@ -34,14 +44,14 @@ router.put('/password', requireAuth, async (req, res) => {
     return res.status(400).json({ error: 'Jaunajai parolei jābūt vismaz 6 rakstzīmēm.' });
   }
 
-  const user = preparedGet('SELECT * FROM users WHERE id = ?', [req.user.id]);
+  const user = preparedGet('SELECT parole AS password_hash FROM lietotaji WHERE id = ?', [req.user.id]);
   const valid = await bcrypt.compare(current_password, user.password_hash);
   if (!valid) {
     return res.status(401).json({ error: 'Pašreizējā parole nav pareiza.' });
   }
 
   const password_hash = await bcrypt.hash(new_password, 10);
-  preparedRun('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash, req.user.id]);
+  preparedRun('UPDATE lietotaji SET parole = ? WHERE id = ?', [password_hash, req.user.id]);
   res.status(204).end();
 });
 

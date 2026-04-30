@@ -6,6 +6,18 @@ const { preparedGet, preparedRun, preparedAll } = require('../db');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
 
+// Lietotāja SELECT ar aliasiem API saderībai
+const USER_SELECT = `
+  SELECT id,
+         vards           AS name,
+         epasts          AS email,
+         parole    AS password_hash,
+         loma            AS role,
+         eksperta_uni_id AS expert_university_id,
+         izveidots       AS created_at
+  FROM lietotaji
+`;
+
 function makeToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, name: user.name, role: user.role, expert_university_id: user.expert_university_id ?? null },
@@ -23,18 +35,18 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'Parolei jābūt vismaz 6 rakstzīmēm.' });
   }
 
-  const existing = preparedGet('SELECT id FROM users WHERE email = ?', [email]);
+  const existing = preparedGet('SELECT id FROM lietotaji WHERE epasts = ?', [email]);
   if (existing) {
     return res.status(409).json({ error: 'Konts ar šo e-pastu jau eksistē.' });
   }
 
-  // First registered user becomes admin
-  const userCount = preparedAll('SELECT id FROM users').length;
-  const role = userCount === 0 ? 'admin' : 'user';
+  // Pirmais reģistrētais lietotājs kļūst par administratoru
+  const skaits = preparedAll('SELECT id FROM lietotaji').length;
+  const role = skaits === 0 ? 'admin' : 'user';
 
   const password_hash = await bcrypt.hash(password, 10);
   const { lastInsertRowid } = preparedRun(
-    'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+    'INSERT INTO lietotaji (vards, epasts, parole, loma) VALUES (?, ?, ?, ?)',
     [name, email, password_hash, role]
   );
 
@@ -48,7 +60,7 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: 'E-pasts un parole ir obligāti.' });
   }
 
-  const user = preparedGet('SELECT * FROM users WHERE email = ?', [email]);
+  const user = preparedGet(USER_SELECT + ' WHERE epasts = ?', [email]);
   if (!user) {
     return res.status(401).json({ error: 'Nepareizs e-pasts vai parole.' });
   }

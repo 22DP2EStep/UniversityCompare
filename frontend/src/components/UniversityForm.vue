@@ -2,13 +2,12 @@
 import { ref } from 'vue'
 
 const emit = defineEmits(['submit', 'cancel'])
-const form = ref({ name: '', location: '', country: '', website: '', description: '', ranking: '', ranking_world: '' })
+const form = ref({ name: '', location: '', country: '', website: '', description: '', ranking: '' })
 
 function submit() {
   const data = {
     ...form.value,
     ranking: form.value.ranking ? Number(form.value.ranking) : null,
-    ranking_world: form.value.ranking_world ? Number(form.value.ranking_world) : null,
   }
   emit('submit', data)
 }
@@ -34,9 +33,7 @@ function submit() {
         <label>Reitings Latvijā
           <input v-model="form.ranking" type="number" min="1" placeholder="piem. 3" />
         </label>
-        <label>Reitings pasaulē
-          <input v-model="form.ranking_world" type="number" min="1" placeholder="piem. 800" />
-        </label>
+
         <label class="full-width">Apraksts
           <textarea v-model="form.description" rows="3" placeholder="Īss apraksts..."></textarea>
         </label>

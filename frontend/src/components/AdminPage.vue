@@ -29,7 +29,7 @@ const selectedUni = ref(null)   // full uni object for popup
 const selectedUser = ref(null)  // full user object for popup
 
 function emptyUniForm() {
-  return { name: '', location: '', country: '', website: '', description: '', ranking: '', ranking_world: '', image_url: '' }
+  return { name: '', location: '', country: '', website: '', description: '', ranking: '', image_url: '' }
 }
 
 async function loadUniversities() {
@@ -59,7 +59,6 @@ function openEditUni(uni) {
     website: uni.website || '',
     description: uni.description || '',
     ranking: uni.ranking ?? '',
-    ranking_world: uni.ranking_world ?? '',
     image_url: uni.image_url ?? '',
   }
   showUniForm.value = true
@@ -75,7 +74,6 @@ async function submitUniForm() {
   const data = {
     ...uniForm.value,
     ranking: uniForm.value.ranking !== '' ? Number(uniForm.value.ranking) : null,
-    ranking_world: uniForm.value.ranking_world !== '' ? Number(uniForm.value.ranking_world) : null,
     image_url: uniForm.value.image_url || null,
   }
   try {
@@ -273,9 +271,7 @@ onMounted(() => loadUniversities())
               <label>{{ t('rankingLatviaField') }}
                 <input v-model="uniForm.ranking" type="number" min="1" placeholder="piem. 3" />
               </label>
-              <label>{{ t('rankingWorldField') }}
-                <input v-model="uniForm.ranking_world" type="number" min="1" placeholder="piem. 800" />
-              </label>
+
               <label class="span2">{{ t('descriptionField') }}
                 <textarea v-model="uniForm.description" rows="2"></textarea>
               </label>

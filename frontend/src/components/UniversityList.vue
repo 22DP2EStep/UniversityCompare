@@ -76,9 +76,6 @@ function initials(name) {
             <span v-if="uni.ranking" class="tag tag-rank-lv">
               #{{ uni.ranking }} {{ t('inLatvia') }}
             </span>
-            <span v-if="uni.ranking_world" class="tag tag-rank-world">
-              &#9733; #{{ uni.ranking_world }} {{ t('inWorld') }}
-            </span>
           </div>
 
           <!-- Action -->

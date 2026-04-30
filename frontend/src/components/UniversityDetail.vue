@@ -56,7 +56,6 @@ function startEdit() {
     website: university.value.website || '',
     description: university.value.description || '',
     ranking: university.value.ranking ?? '',
-    ranking_world: university.value.ranking_world ?? '',
     image_url: university.value.image_url || '',
   }
   editing.value = true
@@ -75,7 +74,6 @@ async function saveEdit() {
     const data = {
       ...form.value,
       ranking: form.value.ranking !== '' ? Number(form.value.ranking) : null,
-      ranking_world: form.value.ranking_world !== '' ? Number(form.value.ranking_world) : null,
       image_url: form.value.image_url || null,
     }
     await api.universities.update(university.value.id, data)
@@ -139,7 +137,6 @@ watch(() => props.id, load, { immediate: true })
         <p class="detail-meta">{{ university.location }}, {{ university.country }}</p>
         <div class="ranking-badges">
           <span v-if="university.ranking" class="rank-badge rank-lv">#{{ university.ranking }} {{ t('inLatvia') }}</span>
-          <span v-if="university.ranking_world" class="rank-badge rank-world">&#9733; #{{ university.ranking_world }} {{ t('inWorld') }}</span>
         </div>
         <a v-if="university.website" :href="university.website" target="_blank" class="website-link">
           {{ university.website }}
@@ -174,9 +171,7 @@ watch(() => props.id, load, { immediate: true })
         <label class="edit-label">{{ t('rankingLatviaField') }}
           <input v-model="form.ranking" class="edit-input" type="number" min="1" />
         </label>
-        <label class="edit-label">{{ t('rankingWorldField') }}
-          <input v-model="form.ranking_world" class="edit-input" type="number" min="1" />
-        </label>
+
         <label class="edit-label span2">{{ t('descriptionField') }}
           <textarea v-model="form.description" class="edit-input" rows="3"></textarea>
         </label>
