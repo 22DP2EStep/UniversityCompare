@@ -168,7 +168,7 @@ watch(() => props.id, load, { immediate: true })
         <label class="edit-label">{{ t('imageUrlField') }}
           <input v-model="form.image_url" class="edit-input" placeholder="https://..." />
         </label>
-        <label class="edit-label">{{ t('rankingLatviaField') }}
+        <label v-if="props.currentUser?.role === 'admin'" class="edit-label">{{ t('rankingLatviaField') }}
           <input v-model="form.ranking" class="edit-input" type="number" min="1" />
         </label>
 
