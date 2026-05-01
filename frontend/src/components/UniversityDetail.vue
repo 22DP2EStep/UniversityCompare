@@ -1,4 +1,6 @@
 <script setup>
+// Universitātes detaļu modāls — attēlo pilnu informāciju, ļauj rediģēt un pārvaldīt programmas
+
 import { ref, watch, computed } from 'vue'
 import { api } from '../api.js'
 import { t, tDegree } from '../i18n.js'
@@ -15,10 +17,10 @@ const editing = ref(false)
 const saving = ref(false)
 const progError = ref('')
 
-// Edit form state
+// Rediģēšanas formas dati (kopē no universitātes objekta kad sāk rediģēt)
 const form = ref({})
 
-// New program form
+// Jaunas programmas formas stāvoklis
 const showProgForm = ref(false)
 const progForm = ref(emptyProg())
 
@@ -26,18 +28,22 @@ function emptyProg() {
   return { name: '', degree: '', duration_years: '', tuition_per_year: '', language: '' }
 }
 
+// Izveido Google Maps iegultās kartes URL pēc universitātes atrašanās vietas
 const mapUrl = computed(() => {
   if (!university.value) return ''
   const q = encodeURIComponent(`${university.value.name}, ${university.value.location}, ${university.value.country}`)
   return `https://www.google.com/maps?q=${q}&output=embed&z=15`
 })
 
+// Administrators var rediģēt jebkuru universitāti
+// Eksperts var rediģēt tikai savu piesaistīto universitāti
 const canEdit = computed(() => {
   if (!props.currentUser || !university.value) return false
   if (props.currentUser.role === 'admin') return true
   return props.currentUser.role === 'expert' && props.currentUser.expert_university_id === university.value.id
 })
 
+// Ielādē universitātes datus no API
 async function load() {
   editing.value = false
   error.value = ''
@@ -48,6 +54,7 @@ async function load() {
   }
 }
 
+// Aizpilda rediģēšanas formu ar esošajiem datiem
 function startEdit() {
   form.value = {
     name: university.value.name,
@@ -67,6 +74,7 @@ function cancelEdit() {
   error.value = ''
 }
 
+// Saglabā rediģētus universitātes datus un pārlādē skatu
 async function saveEdit() {
   saving.value = true
   error.value = ''
@@ -86,6 +94,7 @@ async function saveEdit() {
   }
 }
 
+// Dzēš programmu un atjaunina lokālo sarakstu bez pilnas pārlādes
 async function deleteProgram(id) {
   progError.value = ''
   try {

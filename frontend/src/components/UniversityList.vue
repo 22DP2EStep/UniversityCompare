@@ -1,23 +1,32 @@
 <script setup>
+// Universitāšu saraksts — attēlo universitātes kartēs ar salīdzināšanas iespēju
+
 import { t } from '../i18n.js'
 
 const props = defineProps({
   universities: Array,
   selectedId: Number,
   compareIds: { type: Array, default: () => [] },
+  // canCompare ir false nepieteikušiem lietotājiem — salīdzināšana prasa kontu
   canCompare: { type: Boolean, default: false },
 })
 const emit = defineEmits(['select', 'toggle-compare'])
 
+// Krāsu palette universitātes baneru foniem kad nav attēla URL
 const COLORS = [
   '#a83248', '#7a1f32', '#b45309', '#7c3aed',
   '#be123c', '#6b2737', '#065f46', '#9a3412',
 ]
+
+// Deterministiski izvēlas krāsu pēc universitātes nosaukuma hash — viena un tā pati
+// universitāte vienmēr saņem vienu un to pašu krāsu
 function accentColor(name) {
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
   return COLORS[Math.abs(hash) % COLORS.length]
 }
+
+// Ģenerē iniciaļus no universitātes nosaukuma (max 2 vārdi)
 function initials(name) {
   return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 }

@@ -1,4 +1,6 @@
 <script setup>
+// Sākumlapa — attēlo sistēmas prezentāciju ar statistiku un funkciju aprakstu
+
 import { ref, onMounted, onUnmounted } from 'vue'
 import { lang, toggleLang, t } from '../i18n.js'
 import { api } from '../api.js'
@@ -6,15 +8,20 @@ import { api } from '../api.js'
 defineProps({ currentUser: { type: Object, default: null } })
 defineEmits(['go-to-app', 'go-to-auth', 'go-to-admin', 'go-to-profile', 'logout'])
 
+// Ritināšanas pozīcija — izmanto parallax efektam auditorijas kartēs
 const scrollY = ref(0)
+// Statistikas skaitļi kas tiek ielādēti no API
 const uniCount = ref('—')
 const programCount = ref('—')
 
+// Izseko lapas ritināšanu parallax efektam
 function onScroll() { scrollY.value = window.scrollY }
 
 onMounted(async () => {
+  // passive: true uzlabo ritināšanas veiktspēju mobilajās ierīcēs
   window.addEventListener('scroll', onScroll, { passive: true })
   try {
+    // Ielādē universitāšu un programmu skaitu vienlaikus
     const [unis, programs] = await Promise.all([
       api.universities.list(),
       api.programs.list(),
@@ -24,6 +31,7 @@ onMounted(async () => {
   } catch {}
 })
 
+// Noņem scroll klausītāju lai novērstu atmiņas noplūdi
 onUnmounted(() => window.removeEventListener('scroll', onScroll))
 </script>
 

@@ -1,14 +1,18 @@
 <script setup>
+// Administrācijas panelis — universitāšu un lietotāju pārvaldība
+
 import { ref, onMounted } from 'vue'
 import { api } from '../api.js'
 import { lang, toggleLang, t } from '../i18n.js'
 
 const emit = defineEmits(['back'])
 
+// Aktīvā cilne: 'universities' | 'users'
 const tab = ref('universities')
 const error = ref('')
 
-// ── Confirm dialog ────────────────────────────────────────────
+// ── Apstiprināšanas dialogs ───────────────────────────────────
+// Promise bāzēts dialogs — gaida lietotāja atbildi pirms turpina darbību
 const confirm = ref({ show: false, title: '', message: '', resolve: null })
 
 function askConfirm(title, message) {
@@ -19,14 +23,15 @@ function askConfirm(title, message) {
 function confirmYes() { confirm.value.resolve(true);  confirm.value.show = false }
 function confirmNo()  { confirm.value.resolve(false); confirm.value.show = false }
 
-// ── Universities ──────────────────────────────────────────────
+// ── Universitāšu pārvaldība ───────────────────────────────────
 const universities = ref([])
 const uniLoading = ref(false)
 const showUniForm = ref(false)
+// Ja editingUni ir null — pievienošanas režīms, citādi — rediģēšanas režīms
 const editingUni = ref(null)
 const uniForm = ref(emptyUniForm())
-const selectedUni = ref(null)   // full uni object for popup
-const selectedUser = ref(null)  // full user object for popup
+const selectedUni = ref(null)
+const selectedUser = ref(null)
 
 function emptyUniForm() {
   return { name: '', location: '', country: '', website: '', description: '', ranking: '', image_url: '' }
@@ -44,12 +49,14 @@ async function loadUniversities() {
   }
 }
 
+// Atver tukšu formu jaunas universitātes pievienošanai
 function openAddUni() {
   editingUni.value = null
   uniForm.value = emptyUniForm()
   showUniForm.value = true
 }
 
+// Aizpilda formu ar esošās universitātes datiem rediģēšanai
 function openEditUni(uni) {
   editingUni.value = uni
   uniForm.value = {
@@ -69,6 +76,7 @@ function closeUniForm() {
   editingUni.value = null
 }
 
+// Viena funkcija gan pievienošanai gan rediģēšanai — nosaka pēc editingUni
 async function submitUniForm() {
   error.value = ''
   const data = {
@@ -89,6 +97,7 @@ async function submitUniForm() {
   }
 }
 
+// Prasa apstiprinājumu pirms dzēšanas — dzēšana ir neatgriezeniska
 async function deleteUni(id, name) {
   const ok = await askConfirm(
     t('deleteUniTitle'),
@@ -104,10 +113,12 @@ async function deleteUni(id, name) {
   }
 }
 
-// ── Users ─────────────────────────────────────────────────────
+// ── Lietotāju pārvaldība ──────────────────────────────────────
 const users = ref([])
 const usersLoading = ref(false)
+// savingRole satur lietotāja ID kuram pašlaik tiek saglabāta loma
 const savingRole = ref(null)
+// pendingExpertUni glabā katram lietotājam izvēlēto universitāti pirms saglabāšanas
 const pendingExpertUni = ref({})
 
 async function loadUsers() {
@@ -115,6 +126,7 @@ async function loadUsers() {
   error.value = ''
   try {
     users.value = await api.admin.users.list()
+    // Inicializē pendingExpertUni ar esošajām vērtībām
     users.value.forEach(u => {
       pendingExpertUni.value[u.id] = u.expert_university_id ?? ''
     })

@@ -1,12 +1,17 @@
+// Internacionalizācijas modulis — nodrošina latviešu un angļu valodas atbalstu
+
 import { ref } from 'vue'
 
+// Aktīvā valoda — saglabāta localStorage lai atcerētos starp sesijām
 export const lang = ref(localStorage.getItem('uc_lang') || 'lv')
 
+// Iestata valodu un saglabā izvēli localStorage
 export function setLang(l) {
   lang.value = l
   localStorage.setItem('uc_lang', l)
 }
 
+// Pārslēdz starp latviešu un angļu valodu
 export function toggleLang() {
   setLang(lang.value === 'lv' ? 'en' : 'lv')
 }
@@ -405,16 +410,20 @@ const translations = {
   },
 }
 
+// Atgriež tulkojumu pēc atslēgas aktīvajā valodā
+// Ja tulkojums nav atrasts, atgriež pašu atslēgu
 export function t(key) {
   return translations[lang.value]?.[key] ?? key
 }
 
+// Grādu nosaukumu tulkošana angļu valodā
 const DEGREE_EN = {
   'Bakalaura grāds': "Bachelor's Degree",
   'Maģistra grāds':  "Master's Degree",
   'Doktora grāds':   'Doctoral Degree',
 }
 
+// Tulko grāda nosaukumu atkarībā no aktīvās valodas
 export function tDegree(degree) {
   if (lang.value === 'en') return DEGREE_EN[degree] ?? degree
   return degree

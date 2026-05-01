@@ -1,4 +1,6 @@
 <script setup>
+// Profila lapa — ļauj lietotājam skatīt savu informāciju un mainīt vārdu vai paroli
+
 import { ref, computed } from 'vue'
 import { api } from '../api.js'
 import { lang, toggleLang, t } from '../i18n.js'
@@ -6,6 +8,7 @@ import { lang, toggleLang, t } from '../i18n.js'
 const props = defineProps({ user: Object })
 const emit = defineEmits(['back', 'updated'])
 
+// Aktīvā cilne: 'info' | 'password'
 const tab = ref('info')
 const error = ref('')
 const success = ref('')
@@ -14,14 +17,17 @@ const saving = ref(false)
 const nameForm = ref({ name: props.user.name })
 const passForm = ref({ current: '', newPass: '', confirm: '' })
 
+// Lomu apzīmējumi un krāsas — aprēķinātas jo tulkojumi ir reaktīvi
 const ROLE_LABELS = computed(() => ({ user: t('roleUser'), expert: t('roleExpert'), admin: t('roleAdmin') }))
 const ROLE_COLORS = { user: '#555', expert: '#92400e', admin: '#7a1f32' }
 const ROLE_BG    = { user: '#f5f4f0', expert: '#fef3c7', admin: '#fdf0f2' }
 
+// Ģenerē avatāra iniciaļus no lietotāja vārda
 function initials(name) {
   return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 }
 
+// Saglabā atjaunināto vārdu un atjaunina localStorage ar jauno tokenu
 async function saveName() {
   if (!nameForm.value.name.trim()) return
   saving.value = true
@@ -39,6 +45,7 @@ async function saveName() {
   }
 }
 
+// Validē paroli klienta pusē pirms nosūtīšanas uz serveri
 async function savePassword() {
   error.value = ''
   success.value = ''
@@ -56,6 +63,7 @@ async function savePassword() {
       current_password: passForm.value.current,
       new_password: passForm.value.newPass,
     })
+    // Notīra formu pēc veiksmīgas paroles maiņas
     passForm.value = { current: '', newPass: '', confirm: '' }
     success.value = t('passwordChanged')
   } catch (e) {
@@ -65,6 +73,7 @@ async function savePassword() {
   }
 }
 
+// Pārslēdz cilni un notīra kļūdu/veiksmīguma paziņojumus
 function switchTab(t) {
   tab.value = t
   error.value = ''

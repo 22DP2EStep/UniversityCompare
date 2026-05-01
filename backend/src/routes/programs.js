@@ -1,7 +1,10 @@
+// Studiju programmu maršruti — saraksts, pievienošana, dzēšana
+
 const express = require('express');
 const router = express.Router();
 const { preparedAll, preparedGet, preparedRun } = require('../db');
 
+// Bāzes SELECT vaicājums ar JOIN uz universitāti, atrašanās vietu un grādiem
 const PROG_SELECT = `
   SELECT p.id,
          p.uni_id      AS university_id,
@@ -20,21 +23,25 @@ const PROG_SELECT = `
   JOIN gradi g ON p.grads_id = g.id
 `;
 
-// GET /api/programs
+// GET /api/programs — atgriež visas programmas alfabētiskā secībā
 router.get('/', (req, res) => {
   res.json(preparedAll(PROG_SELECT + ' ORDER BY p.nosaukums ASC'));
 });
 
-// POST /api/programs
+// POST /api/programs — pievieno jaunu studiju programmu universitātei
 router.post('/', (req, res) => {
   const { university_id, name, degree, duration_years, tuition_per_year, language, description } = req.body;
+
+  // Pārbauda obligātos laukus
   if (!university_id || !name || !degree || !duration_years) {
     return res.status(400).json({ error: 'university_id, name, degree un duration_years ir obligāti.' });
   }
 
+  // Pārbauda vai universitāte eksistē
   const uni = preparedGet('SELECT id FROM universitates WHERE id = ?', [university_id]);
   if (!uni) return res.status(404).json({ error: 'Universitāte nav atrasta.' });
 
+  // Pārbauda vai norādītais grāds ir derīgs (meklē gradi tabulā pēc nosaukuma)
   const grads = preparedGet('SELECT id FROM gradi WHERE nosaukums = ?', [degree]);
   if (!grads) return res.status(400).json({ error: `Nezināms grāds: "${degree}". Pieejamie: Bakalaura grāds, Maģistra grāds, Doktora grāds.` });
 
@@ -46,7 +53,7 @@ router.post('/', (req, res) => {
   res.status(201).json({ id: result.lastInsertRowid, university_id, name, degree, duration_years, tuition_per_year, language });
 });
 
-// DELETE /api/programs/:id
+// DELETE /api/programs/:id — dzēš programmu pēc id
 router.delete('/:id', (req, res) => {
   const result = preparedRun('DELETE FROM programmas WHERE id = ?', [req.params.id]);
   if (result.changes === 0) return res.status(404).json({ error: 'Programma nav atrasta.' });

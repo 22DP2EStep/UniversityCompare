@@ -1,9 +1,11 @@
+// Universitāšu maršruti — saraksts, meklēšana, filtrēšana, CRUD operācijas
+
 const express = require('express');
 const router = express.Router();
 const { preparedAll, preparedGet, preparedRun } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 
-// Pilsētu/valsti ņem no atrasanas_vieta caur JOIN
+// Bāzes SELECT vaicājums — apvieno universitates un atrasanas_vieta tabulas
 const UNI_SELECT = `
   SELECT u.id,
          u.nosaukums    AS name,
@@ -12,7 +14,6 @@ const UNI_SELECT = `
          u.vietne       AS website,
          u.apraksts     AS description,
          u.reitings     AS ranking,
-
          u.attela_url   AS image_url,
          u.atrasanas_vieta_id  AS location_id,
          u.izveidots    AS created_at
@@ -20,13 +21,15 @@ const UNI_SELECT = `
   JOIN atrasanas_vieta a ON u.atrasanas_vieta_id = a.id
 `;
 
-// Atrod vai izveido atrašanās vietu, atgriež tās id
+// Atrod vai izveido atrašanās vietas ierakstu, atgriež tās id
+// INSERT OR IGNORE nodrošina ka dublikāti netiek izveidoti
 function getAtrvieta(location, country) {
   preparedRun('INSERT OR IGNORE INTO atrasanas_vieta (pilseta, valsts) VALUES (?,?)', [location, country]);
   return preparedGet('SELECT id FROM atrasanas_vieta WHERE pilseta = ? AND valsts = ?', [location, country]).id;
 }
 
-// GET /api/universities/filter-options
+// GET /api/universities/filter-options — atgriež pieejamās filtrēšanas vērtības
+// Ņem vērā jau aktīvos filtrus lai dinamiski sašaurinātu izvēles
 router.get('/filter-options', (req, res) => {
   const { country, city, search } = req.query;
 
@@ -54,7 +57,9 @@ router.get('/filter-options', (req, res) => {
   res.json({ cities, programs, degrees });
 });
 
-// GET /api/universities
+// GET /api/universities — filtrēts universitāšu saraksts
+// Atbalsta filtrus: search, city, country, program, degree
+// Rezultāti sakārtoti pēc reitinga augošā secībā (labākais reitings = mazākais skaitlis)
 router.get('/', (req, res) => {
   const { country, city, search, program, degree } = req.query;
   const conditions = [];
@@ -62,11 +67,13 @@ router.get('/', (req, res) => {
 
   if (country) { conditions.push('a.valsts = ?');  params.push(country); }
   if (city)    { conditions.push('a.pilseta = ?'); params.push(city); }
+  // Meklē nosaukumā, pilsētā un valstī vienlaikus
   if (search)  {
     conditions.push('(u.nosaukums LIKE ? OR a.pilseta LIKE ? OR a.valsts LIKE ?)');
     params.push(`%${search}%`, `%${search}%`, `%${search}%`);
   }
 
+  // Programmas/grāda filtrs izmanto apakšvaicājumu pret programmas tabulu
   if (program || degree) {
     const sub = [];
     if (program) { sub.push('p.nosaukums LIKE ?'); params.push(`%${program}%`); }
@@ -81,11 +88,12 @@ router.get('/', (req, res) => {
   res.json(preparedAll(query, params));
 });
 
-// GET /api/universities/:id
+// GET /api/universities/:id — iegūst vienu universitāti ar visām tās programmām
 router.get('/:id', (req, res) => {
   const university = preparedGet(UNI_SELECT + ' WHERE u.id = ?', [req.params.id]);
   if (!university) return res.status(404).json({ error: 'Universitāte nav atrasta.' });
 
+  // Iegūst universitātes programmas ar grādu nosaukumiem
   const programs = preparedAll(`
     SELECT p.id,
            p.uni_id      AS university_id,
@@ -104,7 +112,7 @@ router.get('/:id', (req, res) => {
   res.json({ ...university, programs });
 });
 
-// POST /api/universities
+// POST /api/universities — izveido jaunu universitāti (bez autentifikācijas prasības publiskajā maršrutā)
 router.post('/', (req, res) => {
   const { name, location, country, website, description, ranking, image_url } = req.body;
   if (!name || !location || !country) {
@@ -120,11 +128,13 @@ router.post('/', (req, res) => {
   res.status(201).json(preparedGet(UNI_SELECT + ' WHERE u.id = ?', [result.lastInsertRowid]));
 });
 
-// PUT /api/universities/:id
+// PUT /api/universities/:id — atjaunina universitāti
+// Administrators var rediģēt visu, eksperts tikai savu piesaistīto universitāti
 router.put('/:id', requireAuth, (req, res) => {
   const { role, expert_university_id } = req.user;
   const uniId = Number(req.params.id);
 
+  // Pārbauda vai lietotājam ir tiesības rediģēt šo universitāti
   if (role !== 'admin') {
     if (role !== 'expert' || expert_university_id !== uniId) {
       return res.status(403).json({ error: 'Nav tiesību rediģēt šo universitāti.' });
@@ -139,6 +149,7 @@ router.put('/:id', requireAuth, (req, res) => {
   const newCountry  = country  ?? existing.country;
   const atrId = getAtrvieta(newLocation, newCountry);
 
+  // Eksperts nevar mainīt reitingu — tas ir tikai administratora tiesībās
   preparedRun(
     'UPDATE universitates SET nosaukums=?, vietne=?, apraksts=?, reitings=?, attela_url=?, atrasanas_vieta_id=? WHERE id=?',
     [
@@ -155,7 +166,7 @@ router.put('/:id', requireAuth, (req, res) => {
   res.json(preparedGet(UNI_SELECT + ' WHERE u.id = ?', [req.params.id]));
 });
 
-// DELETE /api/universities/:id
+// DELETE /api/universities/:id — dzēš universitāti (tikai administrators)
 router.delete('/:id', requireAdmin, (req, res) => {
   const result = preparedRun('DELETE FROM universitates WHERE id = ?', [req.params.id]);
   if (result.changes === 0) return res.status(404).json({ error: 'Universitāte nav atrasta.' });

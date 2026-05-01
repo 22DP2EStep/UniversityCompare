@@ -1,4 +1,6 @@
 <script setup>
+// Galvenais lietotnes komponents — pārvalda navigāciju starp lapām un globālo stāvokli
+
 import { ref, computed, onMounted, watch } from 'vue'
 import { api } from './api.js'
 import { lang, toggleLang, t, tDegree } from './i18n.js'
@@ -10,27 +12,32 @@ import CompareView from './components/CompareView.vue'
 import ProfilePage from './components/ProfilePage.vue'
 import LandingPage from './components/LandingPage.vue'
 
+// Pieteiktā lietotāja dati (ielādēti no localStorage)
 const currentUser = ref(null)
 const universities = ref([])
+// ID universitātei kuras detaļu modāls ir atvērts
 const selectedId = ref(null)
 const authTab = ref('login')
 const search = ref('')
 const error = ref('')
 const showFilters = ref(false)
 
+// Aktīvie filtri
 const filterCity = ref('')
 const filterProgram = ref('')
 const filterDegree = ref('')
 
+// Pieejamās filtrēšanas izvēles (dinamiski ielādētas no API)
 const filterOptions = ref({ cities: [], programs: [], degrees: [] })
 
-
-// 'landing' | 'home' | 'admin' | 'profile' | 'auth'
+// Aktīvā lapa: 'landing' | 'home' | 'admin' | 'profile' | 'auth'
 const currentPage = ref('landing')
 
+// Universitāšu ID masīvs salīdzināšanai (maksimums 4)
 const compareIds = ref([])
 const showCompare = ref(false)
 
+// Pievieno vai noņem universitāti no salīdzināšanas saraksta
 function toggleCompare(id) {
   const idx = compareIds.value.indexOf(id)
   if (idx === -1) {
@@ -40,25 +47,27 @@ function toggleCompare(id) {
   }
 }
 
+// Atjauno filtrēšanas izvēles atbilstoši aktīvajiem filtriem
+// Grādi tiek sakārtoti noteiktā secībā (bakalaurs → maģistrs → doktors)
 async function refreshFilterOptions() {
   try {
     const params = {}
     if (search.value)     params.search = search.value
     if (filterCity.value) params.city   = filterCity.value
     const opts = await api.universities.filterOptions(params)
-    // Deduplicate programs and degrees (safety net for case/spacing variants)
     const DEGREE_ORDER = ['Bakalaura grāds', 'Maģistra grāds', 'Doktora grāds']
     opts.programs = [...new Set(opts.programs)]
     opts.degrees  = [...new Set(opts.degrees)].sort(
       (a, b) => DEGREE_ORDER.indexOf(a) - DEGREE_ORDER.indexOf(b)
     )
-    // Reset selections if they no longer exist in the new options
+    // Atceļ filtru ja izvēlētā vērtība vairs nav pieejama
     if (filterProgram.value && !opts.programs.includes(filterProgram.value)) filterProgram.value = ''
     if (filterDegree.value  && !opts.degrees.includes(filterDegree.value))   filterDegree.value  = ''
     filterOptions.value = opts
   } catch {}
 }
 
+// Ielādē saglabāto lietotāju no localStorage un ienes universitātes
 onMounted(async () => {
   const stored = localStorage.getItem('uc_user')
   if (stored) currentUser.value = JSON.parse(stored)
@@ -66,15 +75,17 @@ onMounted(async () => {
   refreshFilterOptions()
 })
 
-// When city or search change — refresh available programs/degrees
+// Atjauno filtrēšanas izvēles kad mainās pilsēta vai meklēšanas teksts
 watch([filterCity, search], () => {
   refreshFilterOptions()
 })
 
+// Bloķē lapas ritināšanu kamēr ir atvērts detaļu modāls
 watch(selectedId, (id) => {
   document.body.style.overflow = id ? 'hidden' : ''
 })
 
+// Saglabā pieteikušos lietotāju un pāriet uz galveno lapu
 function handleAuthenticated(user) {
   currentUser.value = user
   currentPage.value = 'home'
@@ -85,6 +96,7 @@ function goToAuth(tab) {
   currentPage.value = 'auth'
 }
 
+// Notīra sesijas datus un atgriežas uz sākumlapu
 function handleLogout() {
   localStorage.removeItem('uc_token')
   localStorage.removeItem('uc_user')
@@ -94,6 +106,7 @@ function handleLogout() {
   showCompare.value = false
 }
 
+// Ielādē universitāšu sarakstu ar aktīvajiem filtriem
 async function loadUniversities() {
   try {
     const params = {}
@@ -107,6 +120,7 @@ async function loadUniversities() {
   }
 }
 
+// Notīra visus filtrus un atjauno pilno sarakstu
 function clearFilters() {
   filterCity.value = ''
   filterProgram.value = ''
@@ -115,11 +129,10 @@ function clearFilters() {
   refreshFilterOptions()
 }
 
+// Aktīvo filtru skaits — tiek rādīts filtrēšanas pogas žetonā
 const activeFilterCount = computed(() =>
   [filterCity.value, filterProgram.value, filterDegree.value].filter(Boolean).length
 )
-
-
 </script>
 
 <template>

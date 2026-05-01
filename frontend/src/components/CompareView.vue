@@ -1,4 +1,6 @@
 <script setup>
+// Salīdzināšanas skats — rāda līdz 4 universitātēm blakus tabulas formātā
+
 import { ref, onMounted } from 'vue'
 import { api } from '../api.js'
 import { t, tDegree } from '../i18n.js'
@@ -10,6 +12,7 @@ const universities = ref([])
 const loading = ref(true)
 const error = ref('')
 
+// Ielādē visu izvēlēto universitāšu datus vienlaikus ar Promise.all
 onMounted(async () => {
   try {
     const results = await Promise.all(props.ids.map(id => api.universities.get(id)))
@@ -21,6 +24,7 @@ onMounted(async () => {
   }
 })
 
+// Formatē mācību maksu ar tūkstošu atdalītāju, atgriež '—' ja nav norādīta
 function formatTuition(val) {
   if (!val) return '—'
   return '$' + Number(val).toLocaleString()

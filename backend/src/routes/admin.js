@@ -1,10 +1,15 @@
+// Administratora maršruti — lietotāju un universitāšu pārvaldība
+// Visi maršruti prasa administratora tiesības (requireAdmin piemērots visam router)
+
 const express = require('express');
 const router = express.Router();
 const { preparedAll, preparedGet, preparedRun } = require('../db');
 const { requireAdmin } = require('../middleware/auth');
 
+// Pievieno requireAdmin visiem šī router maršrutiem vienlaikus
 router.use(requireAdmin);
 
+// Bāzes SELECT vaicājums universitātēm
 const UNI_SELECT = `
   SELECT u.id,
          u.nosaukums    AS name,
@@ -13,7 +18,6 @@ const UNI_SELECT = `
          u.vietne       AS website,
          u.apraksts     AS description,
          u.reitings     AS ranking,
-
          u.attela_url   AS image_url,
          u.atrasanas_vieta_id  AS location_id,
          u.izveidots    AS created_at
@@ -21,11 +25,13 @@ const UNI_SELECT = `
   JOIN atrasanas_vieta a ON u.atrasanas_vieta_id = a.id
 `;
 
+// Atrod vai izveido atrašanās vietas ierakstu
 function getAtrvieta(location, country) {
   preparedRun('INSERT OR IGNORE INTO atrasanas_vieta (pilseta, valsts) VALUES (?,?)', [location, country]);
   return preparedGet('SELECT id FROM atrasanas_vieta WHERE pilseta = ? AND valsts = ?', [location, country]).id;
 }
 
+// Bāzes SELECT vaicājums lietotājiem (bez paroles hash lauka)
 const USER_SELECT = `
   SELECT id,
          vards           AS name,
@@ -36,19 +42,22 @@ const USER_SELECT = `
   FROM lietotaji
 `;
 
-// ── Lietotāji ──────────────────────────────────────────────────
+// ── Lietotāju pārvaldība ────────────────────────────────────────
 
-// GET /api/admin/users
+// GET /api/admin/users — atgriež visu lietotāju sarakstu
 router.get('/users', (req, res) => {
   res.json(preparedAll(USER_SELECT + ' ORDER BY izveidots ASC'));
 });
 
-// PUT /api/admin/users/:id/role
+// PUT /api/admin/users/:id/role — maina lietotāja lomu
 router.put('/users/:id/role', (req, res) => {
   const { role, expert_university_id } = req.body;
+
+  // Pārbauda vai norādītā loma ir derīga
   if (!['user', 'admin', 'expert'].includes(role)) {
     return res.status(400).json({ error: 'Loma var būt tikai "user", "admin" vai "expert".' });
   }
+  // Administrators nevar noņemt pats sev admin tiesības
   if (Number(req.params.id) === req.user.id && role !== 'admin') {
     return res.status(400).json({ error: 'Nevar noņemt pašam savas administratora tiesības.' });
   }
@@ -56,6 +65,7 @@ router.put('/users/:id/role', (req, res) => {
   const user = preparedGet('SELECT id FROM lietotaji WHERE id = ?', [req.params.id]);
   if (!user) return res.status(404).json({ error: 'Lietotājs nav atrasts.' });
 
+  // Eksperta lomai nepieciešams norādīt piesaistīto universitāti
   if (role === 'expert') {
     if (!expert_university_id) {
       return res.status(400).json({ error: 'Ekspertam jānorāda universitāte.' });
@@ -69,6 +79,7 @@ router.put('/users/:id/role', (req, res) => {
     return res.json({ id: Number(req.params.id), role, expert_university_id });
   }
 
+  // Mainot lomu no eksperta uz citu — notīra eksperta universitātes saistījumu
   preparedRun(
     'UPDATE lietotaji SET loma = ?, eksperta_uni_id = NULL WHERE id = ?',
     [role, req.params.id]
@@ -76,8 +87,9 @@ router.put('/users/:id/role', (req, res) => {
   res.json({ id: Number(req.params.id), role, expert_university_id: null });
 });
 
-// DELETE /api/admin/users/:id
+// DELETE /api/admin/users/:id — dzēš lietotāju
 router.delete('/users/:id', (req, res) => {
+  // Administrators nevar dzēst pats savu kontu
   if (Number(req.params.id) === req.user.id) {
     return res.status(400).json({ error: 'Nevar dzēst savu kontu.' });
   }
@@ -86,14 +98,14 @@ router.delete('/users/:id', (req, res) => {
   res.status(204).send();
 });
 
-// ── Universitātes ───────────────────────────────────────────────
+// ── Universitāšu pārvaldība ─────────────────────────────────────
 
-// GET /api/admin/universities
+// GET /api/admin/universities — atgriež visu universitāšu sarakstu pēc reitinga
 router.get('/universities', (req, res) => {
   res.json(preparedAll(UNI_SELECT + ' ORDER BY u.reitings ASC NULLS LAST'));
 });
 
-// POST /api/admin/universities
+// POST /api/admin/universities — izveido jaunu universitāti
 router.post('/universities', (req, res) => {
   const { name, location, country, website, description, ranking, image_url } = req.body;
   if (!name || !location || !country) {
@@ -107,7 +119,7 @@ router.post('/universities', (req, res) => {
   res.status(201).json(preparedGet(UNI_SELECT + ' WHERE u.id = ?', [result.lastInsertRowid]));
 });
 
-// PUT /api/admin/universities/:id
+// PUT /api/admin/universities/:id — atjaunina universitātes datus
 router.put('/universities/:id', (req, res) => {
   const existing = preparedGet(UNI_SELECT + ' WHERE u.id = ?', [req.params.id]);
   if (!existing) return res.status(404).json({ error: 'Universitāte nav atrasta.' });
@@ -132,7 +144,7 @@ router.put('/universities/:id', (req, res) => {
   res.json(preparedGet(UNI_SELECT + ' WHERE u.id = ?', [req.params.id]));
 });
 
-// DELETE /api/admin/universities/:id
+// DELETE /api/admin/universities/:id — dzēš universitāti (kaskādes dzēšana arī programmām)
 router.delete('/universities/:id', (req, res) => {
   const result = preparedRun('DELETE FROM universitates WHERE id = ?', [req.params.id]);
   if (result.changes === 0) return res.status(404).json({ error: 'Universitāte nav atrasta.' });
