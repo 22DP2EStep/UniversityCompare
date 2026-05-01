@@ -171,7 +171,7 @@ async function handleRegister() {
   justify-content: space-between;
   padding: 0 2rem;
   height: 58px;
-  background: #1a1a1a;
+  background: #0f172a;
   color: white;
   flex-shrink: 0;
   border-bottom: 1px solid #2e2e2e;
@@ -247,7 +247,7 @@ async function handleRegister() {
 .app-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.8rem 2rem;
-  background: #1a1a1a;
+  background: #0f172a;
   border-top: 1px solid #2e2e2e;
   flex-shrink: 0;
 }

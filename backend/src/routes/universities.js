@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { preparedAll, preparedGet, preparedRun } = require('../db');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 // Pilsētu/valsti ņem no atrasanas_vieta caur JOIN
 const UNI_SELECT = `
@@ -156,7 +156,7 @@ router.put('/:id', requireAuth, (req, res) => {
 });
 
 // DELETE /api/universities/:id
-router.delete('/:id', (req, res) => {
+router.delete('/:id', requireAdmin, (req, res) => {
   const result = preparedRun('DELETE FROM universitates WHERE id = ?', [req.params.id]);
   if (result.changes === 0) return res.status(404).json({ error: 'Universitāte nav atrasta.' });
   res.status(204).send();

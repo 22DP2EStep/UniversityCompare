@@ -378,7 +378,6 @@ onMounted(() => loadUniversities())
     <Teleport to="body">
       <div v-if="confirm.show" class="confirm-backdrop">
         <div class="confirm-box">
-          <div class="confirm-icon">⚠️</div>
           <h3 class="confirm-title">{{ confirm.title }}</h3>
           <p class="confirm-msg">{{ confirm.message }}</p>
           <div class="confirm-actions">
@@ -660,7 +659,6 @@ onMounted(() => loadUniversities())
   border: 1px solid #d4d0c8;
   border-top: 4px solid #b91c1c;
 }
-.confirm-icon { font-size: 2rem; margin-bottom: 0.6rem; }
 .confirm-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.5rem; color: #1a1a1a; }
 .confirm-msg { font-size: 0.875rem; color: #555; line-height: 1.55; margin-bottom: 1.5rem; }
 .confirm-actions { display: flex; gap: 0.75rem; justify-content: center; }
