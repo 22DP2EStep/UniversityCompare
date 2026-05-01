@@ -1,6 +1,7 @@
 const initSqlJs = require('sql.js');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 const DB_PATH = path.join(__dirname, '..', 'data', 'university_compare.db');
 
@@ -259,6 +260,33 @@ async function init() {
     prog(lka, 'Teoloģija',      BAK, 4, 1200);
     prog(lka, 'Sociālais darbs', BAK, 3, 1200);
 
+    save();
+  }
+
+  // ── Lietotāju sākotnējie dati ─────────────────────────────────
+  const lietSk = db.exec('SELECT COUNT(*) FROM lietotaji')[0].values[0][0];
+  if (lietSk === 0) {
+    const luId = db.exec("SELECT id FROM universitates WHERE nosaukums = 'Latvijas Universitāte'")[0]?.values[0][0];
+
+    db.run('INSERT INTO lietotaji (vards, epasts, parole, loma) VALUES (?,?,?,?)', [
+      'Administrators',
+      'admin@demo.com',
+      bcrypt.hashSync('admin123', 10),
+      'admin',
+    ]);
+    db.run('INSERT INTO lietotaji (vards, epasts, parole, loma) VALUES (?,?,?,?)', [
+      'Lietotājs',
+      'user@demo.com',
+      bcrypt.hashSync('user123', 10),
+      'user',
+    ]);
+    db.run('INSERT INTO lietotaji (vards, epasts, parole, loma, eksperta_uni_id) VALUES (?,?,?,?,?)', [
+      'Eksperts',
+      'expert@demo.com',
+      bcrypt.hashSync('expert123', 10),
+      'expert',
+      luId || null,
+    ]);
     save();
   }
 
