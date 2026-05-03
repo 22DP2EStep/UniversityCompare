@@ -139,7 +139,6 @@ watch(() => props.id, load, { immediate: true })
       <img :src="university.image_url" :alt="university.name" class="detail-img" />
     </div>
 
-    <!-- ── View mode header ── -->
     <div v-if="!editing" class="detail-header">
       <div>
         <h2>{{ university.name }}</h2>
@@ -157,7 +156,6 @@ watch(() => props.id, load, { immediate: true })
       </div>
     </div>
 
-    <!-- ── Edit mode header ── -->
     <div v-else class="edit-section">
       <div class="edit-section-title">&#9998; {{ t('editUniversity') }}</div>
       <div v-if="error" class="inline-error">{{ error }}</div>
@@ -197,7 +195,6 @@ watch(() => props.id, load, { immediate: true })
 
     <p v-if="university.description && !editing" class="description">{{ university.description }}</p>
 
-    <!-- ── Programs section ── -->
     <div class="programs-section">
       <div class="programs-header">
         <h3>{{ t('programs') }}</h3>
@@ -206,7 +203,6 @@ watch(() => props.id, load, { immediate: true })
         </button>
       </div>
 
-      <!-- Add program form -->
       <div v-if="showProgForm && canEdit" class="prog-form">
         <div v-if="progError" class="inline-error">{{ progError }}</div>
         <div class="prog-form-grid">
@@ -259,7 +255,6 @@ watch(() => props.id, load, { immediate: true })
       </table>
     </div>
 
-    <!-- Map section -->
     <div class="map-section">
       <div class="map-header">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
@@ -330,7 +325,6 @@ watch(() => props.id, load, { immediate: true })
 .website-link { font-size: 0.85rem; color: #a83248; text-decoration: none; }
 .website-link:hover { text-decoration: underline; }
 
-/* Edit section */
 .edit-section {
   margin: 1.5rem 2rem 0;
   background: #f9f8f5;
@@ -381,7 +375,6 @@ watch(() => props.id, load, { immediate: true })
 textarea.edit-input { resize: vertical; }
 .edit-actions { display: flex; gap: 0.5rem; margin-top: 0.85rem; }
 
-/* Add program form */
 .prog-form {
   background: #f9f8f5;
   border: 1px solid #d4d0c8;
@@ -443,7 +436,6 @@ textarea.edit-input { resize: vertical; }
 .empty { color: #999; font-size: 0.9rem; padding: 0.5rem 0; }
 .detail-loading { flex: 1; padding: 2rem; color: #999; }
 
-/* Map */
 .map-section {
   margin-top: 1.75rem;
   padding: 0 2rem 2rem;
@@ -472,7 +464,6 @@ textarea.edit-input { resize: vertical; }
   border: none;
 }
 
-/* Buttons */
 .btn {
   padding: 0.4rem 0.9rem;
   border: none;

@@ -138,7 +138,6 @@ const activeFilterCount = computed(() =>
 <template>
   <div class="app">
 
-    <!-- ══ LANDING PAGE ══ -->
     <LandingPage
       v-if="currentPage === 'landing'"
       :currentUser="currentUser"
@@ -149,7 +148,6 @@ const activeFilterCount = computed(() =>
       @logout="handleLogout"
     />
 
-    <!-- ══ AUTH PAGE ══ -->
     <LoginRegister
       v-else-if="currentPage === 'auth'"
       :initialTab="authTab"
@@ -157,13 +155,11 @@ const activeFilterCount = computed(() =>
       @close="currentPage = 'home'"
     />
 
-    <!-- ══ ADMIN PAGE ══ -->
     <AdminPage
       v-else-if="currentPage === 'admin'"
       @back="currentPage = 'home'; loadUniversities()"
     />
 
-    <!-- ══ PROFILE PAGE ══ -->
     <ProfilePage
       v-else-if="currentPage === 'profile' && currentUser"
       :user="currentUser"
@@ -171,10 +167,8 @@ const activeFilterCount = computed(() =>
       @updated="u => { currentUser = u; currentPage = 'home' }"
     />
 
-    <!-- ══ MAIN / HOME ══ -->
     <template v-else>
 
-      <!-- ── Header ── -->
       <header class="app-header">
         <div class="header-brand" @click="currentPage = 'landing'" style="cursor:pointer">
           <div class="brand-logo">
@@ -215,7 +209,6 @@ const activeFilterCount = computed(() =>
         </nav>
       </header>
 
-      <!-- ── Hero search bar ── -->
       <div class="hero">
         <h2 class="hero-title">{{ t('heroTitle') }}</h2>
         <p class="hero-sub">{{ t('heroSub') }}</p>
@@ -241,7 +234,6 @@ const activeFilterCount = computed(() =>
           </button>
         </div>
 
-        <!-- Filter panel -->
         <div v-if="showFilters" class="filter-panel">
           <div class="filter-grid">
             <div class="filter-field">
@@ -272,10 +264,8 @@ const activeFilterCount = computed(() =>
         </div>
       </div>
 
-      <!-- ── Error banner ── -->
       <div v-if="error" class="error-banner">{{ error }}</div>
 
-      <!-- ── Compare bar ── -->
       <div v-if="currentUser && compareIds.length >= 2" class="compare-bar">
         <span><strong>{{ compareIds.length }}</strong> {{ t('universitiesSelected') }}</span>
         <div class="compare-bar-actions">
@@ -284,7 +274,6 @@ const activeFilterCount = computed(() =>
         </div>
       </div>
 
-      <!-- ── Card grid ── -->
       <div class="main-bg">
       <main class="main-content">
         <UniversityList
@@ -298,7 +287,6 @@ const activeFilterCount = computed(() =>
       </main>
       </div>
 
-      <!-- ── Footer ── -->
       <footer class="app-footer">
         <div class="footer-left">
           <div class="footer-logo">
@@ -311,7 +299,6 @@ const activeFilterCount = computed(() =>
         <div class="footer-right">&copy; {{ new Date().getFullYear() }} UniversityCompare</div>
       </footer>
 
-      <!-- ── Detail modal overlay ── -->
       <div v-if="selectedId" class="detail-overlay" @click.self="selectedId = null">
         <div class="detail-modal">
           <UniversityDetail
@@ -323,7 +310,6 @@ const activeFilterCount = computed(() =>
         </div>
       </div>
 
-      <!-- ── Compare modal ── -->
       <CompareView v-if="showCompare" :ids="compareIds" @close="showCompare = false" />
 
     </template>
@@ -345,7 +331,6 @@ body {
   min-height: 100vh;
 }
 
-/* ══ HEADER ══ */
 .app-header {
   display: flex;
   align-items: center;
@@ -441,7 +426,6 @@ body {
 }
 .user-name { font-size: 0.95rem; color: rgba(255,255,255,0.8); font-weight: 500; }
 
-/* ══ HERO ══ */
 .hero {
   background: #0f172a;
   padding: 3.5rem 2rem 3rem;
@@ -589,7 +573,6 @@ body {
 }
 .filter-clear-btn:hover { background: rgba(0,0,0,0.08); color: #1a1a1a; }
 
-/* ══ ERROR / COMPARE BAR ══ */
 .error-banner {
   background: #fef2f2; color: #b91c1c;
   padding: 0.6rem 2rem; font-size: 0.875rem;
@@ -616,7 +599,6 @@ body {
 }
 .btn-compare-clear:hover { background: rgba(0,0,0,0.13); }
 
-/* ══ MAIN CONTENT ══ */
 .main-bg {
   background: #d9d4c7;
   flex: 1;
@@ -629,7 +611,6 @@ body {
   margin: 0 auto;
 }
 
-/* ══ FOOTER ══ */
 .app-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.8rem 2rem;
@@ -648,7 +629,6 @@ body {
 }
 .footer-right { font-size: 0.72rem; color: rgba(255,255,255,0.22); }
 
-/* ══ DETAIL MODAL OVERLAY ══ */
 .detail-overlay {
   position: fixed;
   inset: 0;

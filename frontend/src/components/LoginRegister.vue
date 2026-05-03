@@ -59,7 +59,6 @@ async function handleRegister() {
 
 <template>
   <div class="auth-page">
-    <!-- Header -->
     <header class="app-header">
       <div class="header-brand">
         <div class="brand-logo">
@@ -79,7 +78,6 @@ async function handleRegister() {
       </nav>
     </header>
 
-    <!-- Content -->
     <div class="auth-content">
       <div class="auth-card">
         <div class="auth-logo">
@@ -99,7 +97,6 @@ async function handleRegister() {
 
         <div v-if="error" class="auth-error">{{ error }}</div>
 
-        <!-- Login Form -->
         <form v-if="tab === 'login'" class="auth-form" @submit.prevent="handleLogin">
           <div class="field">
             <label>{{ t('emailLabel') }}</label>
@@ -115,7 +112,6 @@ async function handleRegister() {
           <p class="switch-hint">{{ t('noAccount') }} <span @click="switchTab('register')">{{ t('registerHere') }}</span></p>
         </form>
 
-        <!-- Register Form -->
         <form v-if="tab === 'register'" class="auth-form" @submit.prevent="handleRegister">
           <div class="field">
             <label>{{ t('fullName') }}</label>
@@ -141,7 +137,6 @@ async function handleRegister() {
       </div>
     </div>
 
-    <!-- Footer -->
     <footer class="app-footer">
       <div class="footer-left">
         <div class="footer-logo">
@@ -164,7 +159,6 @@ async function handleRegister() {
   background: #f5f4f0;
 }
 
-/* ── Header (mirrors App.vue) ── */
 .app-header {
   display: flex;
   align-items: center;
@@ -201,7 +195,6 @@ async function handleRegister() {
 .btn-back { background: transparent; color: rgba(255,255,255,0.7); border: 1px solid #3a3a3a; }
 .btn-back:hover { background: #2a2a2a; color: white; }
 
-/* ── Content ── */
 .auth-content {
   flex: 1;
   display: flex;
@@ -243,7 +236,6 @@ async function handleRegister() {
   font-size: 0.85rem;
 }
 
-/* ── Footer (mirrors App.vue) ── */
 .app-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.8rem 2rem;

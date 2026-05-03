@@ -38,7 +38,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 <template>
   <div class="landing">
 
-    <!-- ── Nav ── -->
     <header class="landing-nav">
       <div class="landing-brand">
         <div class="brand-logo">
@@ -75,11 +74,9 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       </nav>
     </header>
 
-    <!-- ── Hero ── -->
     <section class="hero-section">
       <div class="hero-inner">
 
-        <!-- Text -->
         <div class="hero-text">
           <h1 class="hero-heading">{{ t('landingHeroTitle') }}</h1>
           <p class="hero-description">{{ t('landingHeroDesc') }}</p>
@@ -90,7 +87,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 
       </div>
 
-      <!-- Stats bar -->
       <div class="stats-bar">
         <div class="stat"><span class="stat-num">{{ uniCount }}</span><span class="stat-label">{{ t('landingStat1') }}</span></div>
         <div class="stat"><span class="stat-num">{{ programCount }}</span><span class="stat-label">{{ t('landingStat2') }}</span></div>
@@ -98,12 +94,10 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       </div>
     </section>
 
-    <!-- ── How it works ── -->
     <section class="how-section">
       <div class="how-inner">
         <p class="section-label">{{ t('landingHowTitle') }}</p>
 
-        <!-- 01: number left, text right -->
         <div class="how-row">
           <div class="how-num">01</div>
           <div class="how-text">
@@ -112,7 +106,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           </div>
         </div>
 
-        <!-- 02: text left, number right -->
         <div class="how-row how-row--reverse">
           <div class="how-text">
             <h3 class="how-title">{{ t('landingHow2Title') }}</h3>
@@ -121,7 +114,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           <div class="how-num">02</div>
         </div>
 
-        <!-- 03: number left, text right -->
         <div class="how-row">
           <div class="how-num">03</div>
           <div class="how-text">
@@ -133,7 +125,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       </div>
     </section>
 
-    <!-- ── Features ── -->
     <section class="feat-section">
       <div class="feat-inner">
         <p class="section-label">{{ t('landingFeatTitle') }}</p>
@@ -183,7 +174,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       </div>
     </section>
 
-    <!-- ── Audience ── -->
     <section class="audience-section">
       <div class="audience-inner">
         <p class="section-label section-label--light">{{ t('landingForTitle') }}</p>
@@ -212,7 +202,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       </div>
     </section>
 
-    <!-- ── Footer ── -->
     <footer class="landing-footer">
       <div class="footer-left">
         <div class="footer-logo">
@@ -242,7 +231,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   padding-top: 58px;
 }
 
-/* ── Nav ── */
 .landing-nav {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 2rem; height: 58px;
@@ -257,7 +245,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 .brand-name { font-size: 0.95rem; font-weight: 700; color: white; letter-spacing: -0.01em; }
 
-/* ── Hero ── */
 .hero-section {
   position: relative;
   background:
@@ -299,7 +286,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 .cta-btn:hover { background: #7a1f32; }
 
-/* ── UI Mockup ── */
 .hero-visual {
   display: flex;
   flex-direction: column;
@@ -345,7 +331,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   padding: 0.5rem 0.25rem;
 }
 
-/* ── Stats bar ── */
 .stats-bar {
   max-width: 1000px; margin: 0 auto;
   padding: 1.1rem 2rem;
@@ -356,7 +341,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .stat-label { font-size: 0.78rem; color: rgba(255,255,255,0.65); }
 .stat-divider { width: 1px; height: 16px; background: #2e2e2e; }
 
-/* ── Section label ── */
 .section-label {
   font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em;
   text-transform: none; color: #a83248;
@@ -364,7 +348,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 .section-label--light { color: #a83248; }
 
-/* ── Feature rows ── */
 .feature-rows {
   background: #f5f4f0;
   padding: 1rem 2rem 2rem;
@@ -424,7 +407,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   height: 300px;
 }
 
-/* ── How it works ── */
 .how-section {
   background: #d9d4c7;
   padding: 5rem 2rem;
@@ -470,7 +452,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   margin: 0;
 }
 
-/* ── Features ── */
 .feat-section {
   background: #d9d4c7;
   padding: 5rem 2rem;
@@ -499,7 +480,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   line-height: 1.65; margin: 0;
 }
 
-/* ── Audience ── */
 .audience-section {
   background: #0f172a;
   padding: 5rem 2rem;
@@ -535,7 +515,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 .audience-cta { text-align: center; }
 
-/* ── Footer ── */
 .landing-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.8rem 2rem;
@@ -553,7 +532,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 .footer-right { font-size: 0.72rem; color: rgba(255,255,255,0.22); }
 
-/* ── Nav buttons ── */
 .header-nav { display: flex; align-items: center; gap: 0.5rem; }
 .btn {
   padding: 0.42rem 0.9rem; border: none; border-radius: 6px;
@@ -572,7 +550,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #64748b; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; cursor: pointer; }
 .user-name { font-size: 0.95rem; color: rgba(255,255,255,0.8); font-weight: 500; }
 
-/* ── Language button ── */
 .btn-lang {
   display: flex; align-items: center; gap: 5px;
   background: transparent; border: 1px solid #3a3a3a; border-radius: 6px;
@@ -584,7 +561,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .lang-sep { color: #3a3a3a; font-size: 0.65rem; }
 .lang-active { color: white; }
 
-/* ── Responsive ── */
 @media (max-width: 780px) {
   .hero-inner { padding: 3rem 1.25rem 2rem; }
   .hero-heading { font-size: 2rem; }

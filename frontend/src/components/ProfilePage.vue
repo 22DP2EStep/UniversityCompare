@@ -84,7 +84,6 @@ function switchTab(t) {
 <template>
   <div class="profile-page">
 
-    <!-- Page header -->
     <div class="page-header">
       <div class="page-header-inner">
         <button class="back-btn" @click="emit('back')">
@@ -105,11 +104,9 @@ function switchTab(t) {
       </div>
     </div>
 
-    <!-- Content -->
     <div class="page-body">
       <div class="profile-card">
 
-        <!-- Identity card -->
         <div class="identity-card">
           <div class="identity-avatar">{{ initials(user.name) }}</div>
           <div class="identity-info">
@@ -127,17 +124,14 @@ function switchTab(t) {
           </div>
         </div>
 
-        <!-- Tabs -->
         <div class="profile-tabs">
           <button :class="['ptab', tab === 'info' && 'active']" @click="switchTab('info')">{{ t('tabInfo') }}</button>
           <button :class="['ptab', tab === 'password' && 'active']" @click="switchTab('password')">{{ t('tabPassword') }}</button>
         </div>
 
-        <!-- Messages -->
         <div v-if="error" class="msg msg-error">{{ error }}</div>
         <div v-if="success" class="msg msg-success">{{ success }}</div>
 
-        <!-- Info tab -->
         <div v-if="tab === 'info'" class="tab-content">
           <div class="section-label">{{ t('editName') }}</div>
           <div class="field-row">
@@ -171,7 +165,6 @@ function switchTab(t) {
           </div>
         </div>
 
-        <!-- Password tab -->
         <div v-if="tab === 'password'" class="tab-content">
           <div class="section-label">{{ t('changePasswordTitle') }}</div>
           <div class="pass-form">
@@ -204,7 +197,6 @@ function switchTab(t) {
   flex-direction: column;
 }
 
-/* Page header */
 .page-header {
   background: #0f172a;
   border-bottom: 3px solid #a83248;
@@ -250,7 +242,6 @@ function switchTab(t) {
 .page-title { font-size: 1.15rem; font-weight: 800; color: white; letter-spacing: -0.02em; }
 .page-subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.45); }
 
-/* Body */
 .page-body {
   flex: 1;
   padding: 2rem;
@@ -259,7 +250,6 @@ function switchTab(t) {
   margin: 0 auto;
 }
 
-/* Profile card */
 .profile-card {
   background: #fdfcfa;
   border-radius: 10px;
@@ -267,7 +257,6 @@ function switchTab(t) {
   overflow: hidden;
 }
 
-/* Identity card */
 .identity-card {
   display: flex;
   align-items: center;
@@ -305,7 +294,6 @@ function switchTab(t) {
   width: fit-content;
 }
 
-/* Tabs */
 .profile-tabs {
   display: flex;
   border-bottom: 1px solid #d4d0c8;
@@ -330,7 +318,6 @@ function switchTab(t) {
   background: #fdfcfa;
 }
 
-/* Messages */
 .msg {
   padding: 0.65rem 1.5rem;
   font-size: 0.85rem;
@@ -339,7 +326,6 @@ function switchTab(t) {
 .msg-error { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
 .msg-success { background: #fdf0f2; color: #7a1f32; border-color: #f8d4d8; }
 
-/* Tab content */
 .tab-content { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
 
 .section-label {

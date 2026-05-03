@@ -52,21 +52,18 @@ function formatTuition(val) {
       <div v-else class="compare-body">
         <div class="compare-grid" :style="{ gridTemplateColumns: `180px repeat(${universities.length}, 1fr)` }">
 
-          <!-- Header row -->
           <div class="cell label-col"></div>
           <div v-for="uni in universities" :key="uni.id" class="cell uni-header">
             <div class="uni-title">{{ uni.name }}</div>
             <div class="uni-sub">{{ uni.location }}, {{ uni.country }}</div>
           </div>
 
-          <!-- Latvia ranking -->
           <div class="cell row-label">{{ t('rankLatvia') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-rlv'" class="cell">
             <span v-if="uni.ranking" class="badge badge-rank-lv">#{{ uni.ranking }} {{ t('inLatvia') }}</span>
             <span v-else class="muted">—</span>
           </div>
 
-          <!-- Website -->
           <div class="cell row-label">{{ t('website') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-w'" class="cell">
             <a v-if="uni.website" :href="uni.website" target="_blank" class="website-link">
@@ -75,19 +72,16 @@ function formatTuition(val) {
             <span v-else class="muted">—</span>
           </div>
 
-          <!-- Description -->
           <div class="cell row-label">{{ t('description') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-d'" class="cell desc">
             {{ uni.description || '—' }}
           </div>
 
-          <!-- Programs count -->
           <div class="cell row-label">{{ t('programs') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-pc'" class="cell">
             <span class="badge">{{ uni.programs?.length ?? 0 }} {{ t('progAbbr') }}</span>
           </div>
 
-          <!-- Programs list -->
           <div class="cell row-label top">{{ t('programsList') }}</div>
           <div v-for="uni in universities" :key="uni.id + '-pl'" class="cell programs-cell">
             <div v-if="!uni.programs?.length" class="muted">{{ t('noProgramsList') }}</div>
@@ -210,14 +204,12 @@ function formatTuition(val) {
 }
 .cell:last-child { border-right: none; }
 
-/* University name header */
 .uni-header {
   background: #fdf0f2;
 }
 .uni-title { font-size: 0.925rem; font-weight: 700; color: #a83248; line-height: 1.3; }
 .uni-sub { font-size: 0.75rem; color: #888; margin-top: 3px; }
 
-/* Row labels */
 .label-col { background: #f5f4f0; }
 .row-label {
   background: #f5f4f0;
@@ -229,7 +221,6 @@ function formatTuition(val) {
 }
 .row-label.top { vertical-align: top; }
 
-/* Badges */
 .badge {
   display: inline-block;
   padding: 0.2rem 0.55rem;
@@ -249,7 +240,6 @@ function formatTuition(val) {
 .website-link { color: #a83248; font-size: 0.82rem; text-decoration: none; font-weight: 600; }
 .website-link:hover { text-decoration: underline; }
 
-/* Programs */
 .programs-cell { display: flex; flex-direction: column; gap: 0.6rem; }
 .program-row {
   padding: 0.5rem 0.65rem;

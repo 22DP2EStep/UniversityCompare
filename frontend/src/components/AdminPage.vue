@@ -11,7 +11,6 @@ const emit = defineEmits(['back'])
 const tab = ref('universities')
 const error = ref('')
 
-// ── Apstiprināšanas dialogs ───────────────────────────────────
 // Promise bāzēts dialogs — gaida lietotāja atbildi pirms turpina darbību
 const confirm = ref({ show: false, title: '', message: '', resolve: null })
 
@@ -23,7 +22,6 @@ function askConfirm(title, message) {
 function confirmYes() { confirm.value.resolve(true);  confirm.value.show = false }
 function confirmNo()  { confirm.value.resolve(false); confirm.value.show = false }
 
-// ── Universitāšu pārvaldība ───────────────────────────────────
 const universities = ref([])
 const uniLoading = ref(false)
 const showUniForm = ref(false)
@@ -113,7 +111,6 @@ async function deleteUni(id, name) {
   }
 }
 
-// ── Lietotāju pārvaldība ──────────────────────────────────────
 const users = ref([])
 const usersLoading = ref(false)
 // savingRole satur lietotāja ID kuram pašlaik tiek saglabāta loma
@@ -219,7 +216,6 @@ onMounted(() => loadUniversities())
 <template>
   <div class="admin-page">
 
-    <!-- Page header -->
     <div class="page-header">
       <div class="page-header-inner">
         <button class="back-btn" @click="emit('back')">
@@ -240,7 +236,6 @@ onMounted(() => loadUniversities())
       </div>
     </div>
 
-    <!-- Content -->
     <div class="page-body">
 
       <div class="admin-card">
@@ -255,7 +250,6 @@ onMounted(() => loadUniversities())
 
         <div v-if="error" class="admin-error">{{ error }}</div>
 
-        <!-- ── Universities tab ── -->
         <div v-if="tab === 'universities'" class="tab-body">
           <div class="tab-toolbar">
             <span class="count">{{ universities.length }} {{ t('records') }}</span>
@@ -325,7 +319,6 @@ onMounted(() => loadUniversities())
           <div v-else class="empty-state">{{ t('noUniversities') }}</div>
         </div>
 
-        <!-- ── Users tab ── -->
         <div v-if="tab === 'users'" class="tab-body">
           <div class="tab-toolbar">
             <span class="count">{{ users.length }} {{ t('usersCount') }}</span>
@@ -386,7 +379,6 @@ onMounted(() => loadUniversities())
 
     </div>
 
-    <!-- Confirm dialog -->
     <Teleport to="body">
       <div v-if="confirm.show" class="confirm-backdrop">
         <div class="confirm-box">
@@ -411,7 +403,6 @@ onMounted(() => loadUniversities())
   flex-direction: column;
 }
 
-/* Page header */
 .page-header {
   background: #0f172a;
   border-bottom: 3px solid #a83248;
@@ -457,7 +448,6 @@ onMounted(() => loadUniversities())
 .page-title { font-size: 1.15rem; font-weight: 800; color: white; letter-spacing: -0.02em; }
 .page-subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.45); }
 
-/* Body */
 .page-body {
   flex: 1;
   padding: 2rem;
@@ -466,7 +456,6 @@ onMounted(() => loadUniversities())
   margin: 0 auto;
 }
 
-/* Admin card */
 .admin-card {
   background: #fdfcfa;
   border-radius: 10px;
@@ -519,7 +508,6 @@ onMounted(() => loadUniversities())
 }
 .count { font-size: 0.8rem; color: #888; font-weight: 500; }
 
-/* Inline form */
 .inline-form {
   background: #f5f4f0;
   border: 1px solid #d4d0c8;
@@ -563,7 +551,6 @@ onMounted(() => loadUniversities())
 .span2 { grid-column: span 2; }
 .form-actions { display: flex; gap: 0.5rem; }
 
-/* Table */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -610,7 +597,6 @@ onMounted(() => loadUniversities())
 .popup-sub { font-size: 0.82rem; color: #999; margin: 0 0 1.5rem; }
 .popup-actions { display: flex; gap: 0.65rem; justify-content: center; }
 
-/* Buttons */
 .btn {
   padding: 0.35rem 0.75rem;
   border: none;
@@ -631,7 +617,6 @@ onMounted(() => loadUniversities())
 .btn-danger:hover { background: #991b1b; }
 .btn-sm { padding: 0.22rem 0.55rem; font-size: 0.78rem; }
 
-/* Role select */
 .role-select {
   padding: 0.3rem 0.5rem;
   border-radius: 5px;
@@ -650,7 +635,6 @@ onMounted(() => loadUniversities())
 
 .loading, .empty-state { color: #999; padding: 1.5rem 0; font-size: 0.9rem; text-align: center; }
 
-/* Confirm dialog */
 .confirm-backdrop {
   position: fixed;
   inset: 0;

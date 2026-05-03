@@ -46,7 +46,6 @@ function initials(name) {
         :class="{ 'is-compare': compareIds.includes(uni.id) }"
         @click="emit('select', uni.id)"
       >
-        <!-- Image or colored banner -->
         <div class="card-banner" :style="uni.image_url ? '' : `background: ${accentColor(uni.name)}`">
           <img v-if="uni.image_url" :src="uni.image_url" :alt="uni.name" class="card-img" />
           <div v-else class="card-banner-initials">{{ initials(uni.name) }}</div>
@@ -68,10 +67,8 @@ function initials(name) {
         </div>
 
         <div class="card-inner">
-          <!-- Name -->
           <h3 class="card-name">{{ uni.name }}</h3>
 
-          <!-- Location -->
           <div class="card-location">
             <svg viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.3" width="11" height="11" style="flex-shrink:0">
               <path d="M6 1C3.79 1 2 2.79 2 5c0 3.5 4 8 4 8s4-4.5 4-8c0-2.21-1.79-4-4-4z" stroke-linejoin="round"/>
@@ -80,14 +77,12 @@ function initials(name) {
             {{ uni.location }}, {{ uni.country }}
           </div>
 
-          <!-- Tags row -->
           <div class="card-tags">
             <span v-if="uni.ranking" class="tag tag-rank-lv">
               #{{ uni.ranking }} {{ t('inLatvia') }}
             </span>
           </div>
 
-          <!-- Action -->
           <button class="card-cta">
             {{ t('viewDetails') }}
             <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
@@ -114,7 +109,6 @@ function initials(name) {
   gap: 1.25rem;
 }
 
-/* ── Card ── */
 .card {
   background: #f5f4f0;
   border-radius: 10px;
@@ -135,7 +129,6 @@ function initials(name) {
   box-shadow: 0 0 0 3px rgba(168,50,72,0.15);
 }
 
-/* Banner (image or colored) */
 .card-banner {
   position: relative;
   height: 140px;
@@ -167,7 +160,6 @@ function initials(name) {
   flex: 1;
 }
 
-/* University name */
 .card-name {
   font-size: 0.975rem;
   font-weight: 700;
@@ -179,7 +171,6 @@ function initials(name) {
   -webkit-box-orient: vertical;
 }
 
-/* Location */
 .card-location {
   display: flex;
   align-items: center;
@@ -191,7 +182,6 @@ function initials(name) {
   white-space: nowrap;
 }
 
-/* Tags */
 .card-tags {
   display: flex;
   gap: 0.35rem;
@@ -210,7 +200,6 @@ function initials(name) {
 .tag-rank-lv { background: #fdf0f2; color: #7a1f32; }
 .tag-rank-world { background: #fef3c7; color: #92400e; }
 
-/* CTA button */
 .card-cta {
   display: flex;
   align-items: center;
@@ -232,7 +221,6 @@ function initials(name) {
 }
 .card:hover .card-cta { color: #7a1f32; }
 
-/* Compare toggle button — floats on the banner */
 .compare-btn {
   position: absolute;
   top: 8px;
