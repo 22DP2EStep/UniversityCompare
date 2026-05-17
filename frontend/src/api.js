@@ -1,6 +1,6 @@
 // API klients — visi HTTP pieprasījumi uz backend tiek veikti caur šo moduli
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Iegūst JWT tokenu no localStorage
 function getToken() {
