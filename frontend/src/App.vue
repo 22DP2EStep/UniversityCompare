@@ -106,17 +106,30 @@ function handleLogout() {
   showCompare.value = false
 }
 
-// Ielādē universitāšu sarakstu ar aktīvajiem filtriem
-async function loadUniversities() {
-  try {
-    const params = {}
-    if (search.value)        params.search  = search.value
-    if (filterCity.value)    params.city    = filterCity.value
-    if (filterProgram.value) params.program = filterProgram.value
-    if (filterDegree.value)  params.degree  = filterDegree.value
-    universities.value = await api.universities.list(params)
-  } catch (e) {
-    error.value = e.message
+// Ielādē universitāšu sarakstu ar aktīvajiem filtriem.
+// Ja backends vēl sākas (aukstais starts uz bezmaksas hosting), mēģina vēlreiz.
+const serverWaking = ref(false)
+async function loadUniversities(retries = 4, delayMs = 4000) {
+  error.value = ''
+  const params = {}
+  if (search.value)        params.search  = search.value
+  if (filterCity.value)    params.city    = filterCity.value
+  if (filterProgram.value) params.program = filterProgram.value
+  if (filterDegree.value)  params.degree  = filterDegree.value
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      universities.value = await api.universities.list(params)
+      serverWaking.value = false
+      return
+    } catch (e) {
+      if (attempt < retries) {
+        serverWaking.value = true
+        await new Promise(r => setTimeout(r, delayMs))
+      } else {
+        serverWaking.value = false
+        error.value = e.message
+      }
+    }
   }
 }
 
@@ -264,6 +277,13 @@ const activeFilterCount = computed(() =>
         </div>
       </div>
 
+      <div v-if="serverWaking" class="waking-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="animation:spin 1s linear infinite;flex-shrink:0">
+          <circle cx="12" cy="12" r="10" stroke-opacity=".3"/>
+          <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
+        </svg>
+        {{ t('serverWaking') }}
+      </div>
       <div v-if="error" class="error-banner">{{ error }}</div>
 
       <div v-if="currentUser && compareIds.length >= 2" class="compare-bar">
@@ -573,6 +593,13 @@ body {
 }
 .filter-clear-btn:hover { background: rgba(0,0,0,0.08); color: #1a1a1a; }
 
+.waking-banner {
+  background: #fffbeb; color: #92400e;
+  padding: 0.6rem 2rem; font-size: 0.875rem;
+  border-bottom: 1px solid #fde68a;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 .error-banner {
   background: #fef2f2; color: #b91c1c;
   padding: 0.6rem 2rem; font-size: 0.875rem;

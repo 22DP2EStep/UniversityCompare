@@ -16,8 +16,14 @@ async function init() {
   const SQL = await initSqlJs();
 
   if (fs.existsSync(DB_PATH)) {
-    const fileBuffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(fileBuffer);
+    try {
+      const fileBuffer = fs.readFileSync(DB_PATH);
+      db = new SQL.Database(fileBuffer);
+      db.exec('SELECT 1'); // pārbauda vai fails nav bojāts
+    } catch {
+      fs.unlinkSync(DB_PATH);
+      db = new SQL.Database();
+    }
   } else {
     db = new SQL.Database();
   }

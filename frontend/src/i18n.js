@@ -89,6 +89,7 @@ const translations = {
     filterDegree: 'Grāds',
     filterAll: 'Visi',
     clearFilters: 'Notīrīt filtrus',
+    serverWaking: 'Serveris sākas... lūdzu uzgaidiet dažas sekundes.',
 
     // UniversityList
     noResults: 'Nav atrasts neviens ieraksts.',
@@ -285,6 +286,7 @@ const translations = {
     filterDegree: 'Degree',
     filterAll: 'All',
     clearFilters: 'Clear filters',
+    serverWaking: 'Server is starting up… please wait a few seconds.',
 
     // UniversityList
     noResults: 'No records found.',
