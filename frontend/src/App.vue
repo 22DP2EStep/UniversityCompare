@@ -233,7 +233,7 @@ const activeFilterCount = computed(() =>
             </svg>
             <input
               v-model="search"
-              @input="loadUniversities"
+              @input="() => loadUniversities()"
               :placeholder="t('searchPlaceholder')"
               class="hero-search-input"
             />
@@ -251,21 +251,21 @@ const activeFilterCount = computed(() =>
           <div class="filter-grid">
             <div class="filter-field">
               <label>{{ t('filterCity') }}</label>
-              <select v-model="filterCity" @change="loadUniversities">
+              <select v-model="filterCity" @change="() => loadUniversities()">
                 <option value="">{{ t('filterAll') }}</option>
                 <option v-for="c in filterOptions.cities" :key="c" :value="c">{{ c }}</option>
               </select>
             </div>
             <div class="filter-field">
               <label>{{ t('filterProgram') }}</label>
-              <select v-model="filterProgram" @change="loadUniversities">
+              <select v-model="filterProgram" @change="() => loadUniversities()">
                 <option value="">{{ t('filterAll') }}</option>
                 <option v-for="p in filterOptions.programs" :key="p" :value="p">{{ p }}</option>
               </select>
             </div>
             <div class="filter-field">
               <label>{{ t('filterDegree') }}</label>
-              <select v-model="filterDegree" @change="loadUniversities">
+              <select v-model="filterDegree" @change="() => loadUniversities()">
                 <option value="">{{ t('filterAll') }}</option>
                 <option v-for="d in filterOptions.degrees" :key="d" :value="d">{{ tDegree(d) }}</option>
               </select>
