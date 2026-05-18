@@ -148,17 +148,18 @@ function formatTuition(val) {
 }
 
 .back-btn {
-  background: rgba(168,50,72,0.15);
-  border: 1px solid rgba(168,50,72,0.4);
-  color: #c87888;
-  font-size: 0.82rem;
+  background: #a83248;
+  border: none;
+  color: white;
+  font-size: 0.95rem;
   font-weight: 600;
-  border-radius: 5px;
-  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  padding: 0.5rem 1.1rem;
   cursor: pointer;
+  font-family: inherit;
   transition: background 0.15s;
 }
-.back-btn:hover { background: rgba(168,50,72,0.28); }
+.back-btn:hover { background: #7a1f32; }
 
 .close-btn {
   background: rgba(255,255,255,0.08);
