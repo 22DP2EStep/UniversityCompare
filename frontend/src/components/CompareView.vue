@@ -151,10 +151,10 @@ function formatTuition(val) {
   background: #a83248;
   border: none;
   color: white;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-weight: 600;
   border-radius: 6px;
-  padding: 0.5rem 1.1rem;
+  padding: 0.3rem 0.75rem;
   cursor: pointer;
   font-family: inherit;
   transition: background 0.15s;
