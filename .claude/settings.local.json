@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(Get-ChildItem \"C:\\\\Users\\\\User\\\\Documents\\\\UniversityCompare\\\\backend\" -Exclude node_modules)",
-      "Bash(Select-Object Name)"
-    ]
-  }
-}
