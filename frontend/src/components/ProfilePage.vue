@@ -19,8 +19,8 @@ const passForm = ref({ current: '', newPass: '', confirm: '' })
 
 // Lomu apzīmējumi un krāsas — aprēķinātas jo tulkojumi ir reaktīvi
 const ROLE_LABELS = computed(() => ({ user: t('roleUser'), expert: t('roleExpert'), admin: t('roleAdmin') }))
-const ROLE_COLORS = { user: '#555', expert: '#92400e', admin: '#7a1f32' }
-const ROLE_BG    = { user: '#f5f4f0', expert: '#fef3c7', admin: '#fdf0f2' }
+const ROLE_COLORS = { user: '#555', expert: '#fff', admin: '#fff' }
+const ROLE_BG    = { user: '#f5f4f0', expert: '#b45309', admin: '#a83248' }
 
 // Ģenerē avatāra iniciaļus no lietotāja vārda
 function initials(name) {
@@ -283,7 +283,7 @@ function switchTab(t) {
 .identity-info { display: flex; flex-direction: column; gap: 3px; }
 .identity-name { font-size: 1rem; font-weight: 700; color: #1a1a1a; }
 .identity-email { font-size: 0.82rem; color: #888; }
-.identity-expert-note { width: 100%; font-size: 0.78rem; color: #92400e; background: #fef3c7; padding: 0.3rem 0.6rem; border-radius: 5px; margin-top: 0.25rem; }
+.identity-expert-note { width: 100%; font-size: 0.78rem; color: #fff; background: #b45309; padding: 0.3rem 0.6rem; border-radius: 5px; margin-top: 0.25rem; }
 
 .role-badge {
   display: inline-block;
@@ -324,7 +324,7 @@ function switchTab(t) {
   border-bottom: 1px solid;
 }
 .msg-error { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
-.msg-success { background: #fdf0f2; color: #7a1f32; border-color: #f8d4d8; }
+.msg-success { background: #a83248; color: #fff; border-color: #7a1f32; }
 
 .tab-content { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
 

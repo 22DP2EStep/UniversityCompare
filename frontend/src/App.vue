@@ -1,7 +1,7 @@
 <script setup>
 // Galvenais lietotnes komponents — pārvalda navigāciju starp lapām un globālo stāvokli
 
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { api } from './api.js'
 import { lang, toggleLang, t, tDegree } from './i18n.js'
 import LoginRegister from './components/LoginRegister.vue'
@@ -37,6 +37,56 @@ const currentPage = ref('landing')
 const compareIds = ref([])
 const showCompare = ref(false)
 
+// Pieteikušos lietotāju funkcijas: izlase, kārtošana, URL sinhronizācija
+const sortBy = ref('ranking')
+const favorites = ref(new Set())
+const showFavoritesOnly = ref(false)
+
+const favoriteIds = computed(() => [...favorites.value])
+
+const displayedUniversities = computed(() => {
+  if (!currentUser.value) return universities.value
+  let list = [...universities.value]
+  if (showFavoritesOnly.value) {
+    list = list.filter(u => favorites.value.has(u.id))
+  }
+  if (sortBy.value === 'name') {
+    list.sort((a, b) => a.name.localeCompare(b.name))
+  } else if (sortBy.value === 'programs') {
+    list.sort((a, b) => (b.program_count ?? 0) - (a.program_count ?? 0))
+  }
+  return list
+})
+
+const SORT_CYCLE = ['ranking', 'name', 'programs']
+function cycleSortBy() {
+  const idx = SORT_CYCLE.indexOf(sortBy.value)
+  sortBy.value = SORT_CYCLE[(idx + 1) % SORT_CYCLE.length]
+}
+
+function toggleFavorite(id) {
+  const next = new Set(favorites.value)
+  if (next.has(id)) next.delete(id)
+  else next.add(id)
+  favorites.value = next
+  localStorage.setItem('uc_favorites', JSON.stringify([...next]))
+}
+
+function syncUrl() {
+  const params = new URLSearchParams()
+  if (search.value) params.set('search', search.value)
+  if (filterCity.value) params.set('city', filterCity.value)
+  if (filterProgram.value) params.set('program', filterProgram.value)
+  if (filterDegree.value) params.set('degree', filterDegree.value)
+  if (currentUser.value) {
+    if (sortBy.value && sortBy.value !== 'ranking') params.set('sort', sortBy.value)
+    if (showFavoritesOnly.value) params.set('fav', '1')
+    if (compareIds.value.length) params.set('compare', compareIds.value.join(','))
+  }
+  const qs = params.toString()
+  history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname)
+}
+
 // Pievieno vai noņem universitāti no salīdzināšanas saraksta
 function toggleCompare(id) {
   const idx = compareIds.value.indexOf(id)
@@ -71,8 +121,31 @@ async function refreshFilterOptions() {
 onMounted(async () => {
   const stored = localStorage.getItem('uc_user')
   if (stored) currentUser.value = JSON.parse(stored)
+
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('search'))  search.value       = params.get('search')
+  if (params.get('city'))    filterCity.value    = params.get('city')
+  if (params.get('program')) filterProgram.value = params.get('program')
+  if (params.get('degree'))  filterDegree.value  = params.get('degree')
+  if (currentUser.value) {
+    if (params.get('sort'))           sortBy.value          = params.get('sort')
+    if (params.get('fav') === '1')    showFavoritesOnly.value = true
+    if (params.get('compare')) {
+      compareIds.value = params.get('compare').split(',').map(Number).filter(Boolean)
+    }
+    const savedFav = localStorage.getItem('uc_favorites')
+    if (savedFav) favorites.value = new Set(JSON.parse(savedFav))
+  }
+
   loadUniversities()
   refreshFilterOptions()
+
+  await nextTick()
+  watch(
+    [search, filterCity, filterProgram, filterDegree, sortBy, showFavoritesOnly, compareIds],
+    syncUrl,
+    { deep: true }
+  )
 })
 
 // Atjauno filtrēšanas izvēles kad mainās pilsēta vai meklēšanas teksts
@@ -89,6 +162,8 @@ watch(selectedId, (id) => {
 function handleAuthenticated(user) {
   currentUser.value = user
   currentPage.value = 'home'
+  const savedFav = localStorage.getItem('uc_favorites')
+  if (savedFav) favorites.value = new Set(JSON.parse(savedFav))
 }
 
 function goToAuth(tab) {
@@ -104,6 +179,9 @@ function handleLogout() {
   currentPage.value = 'home'
   compareIds.value = []
   showCompare.value = false
+  sortBy.value = 'ranking'
+  showFavoritesOnly.value = false
+  syncUrl()
 }
 
 // Ielādē universitāšu sarakstu ar aktīvajiem filtriem.
@@ -205,6 +283,9 @@ const activeFilterCount = computed(() =>
 
           <template v-if="currentUser">
             <button v-if="currentUser.role === 'admin'" class="btn btn-admin" @click="currentPage = 'admin'">{{ t('adminBtn') }}</button>
+            <button class="btn btn-fav" :class="{ active: showFavoritesOnly }" @click="showFavoritesOnly = !showFavoritesOnly">
+              {{ t('showFavorites') }}<template v-if="favorites.size"> ({{ favorites.size }})</template>
+            </button>
             <div class="user-menu">
               <div class="user-avatar" @click="currentPage = 'profile'" :title="t('viewProfile')">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
@@ -244,6 +325,15 @@ const activeFilterCount = computed(() =>
             </svg>
             {{ t('filters') }}
             <span v-if="activeFilterCount > 0" class="filter-badge">{{ activeFilterCount }}</span>
+          </button>
+          <button v-if="currentUser" class="filter-toggle-btn" :class="{ active: sortBy !== 'ranking' }" @click="cycleSortBy">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path d="M5 12a1 1 0 102 0V6.414l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L5 6.414V12zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z"/>
+            </svg>
+            {{ t('sort') }}
+            <span style="display:inline-block;width:2.6rem;text-align:center;flex-shrink:0">
+              <span v-if="sortBy !== 'ranking'" class="filter-badge">{{ sortBy === 'name' ? 'A–Z' : 'Prog.' }}</span>
+            </span>
           </button>
         </div>
 
@@ -297,12 +387,15 @@ const activeFilterCount = computed(() =>
       <div class="main-bg">
       <main class="main-content">
         <UniversityList
-          :universities="universities"
+          :universities="displayedUniversities"
           :selectedId="selectedId"
           :compareIds="compareIds"
           :canCompare="!!currentUser"
+          :favoriteIds="favoriteIds"
+          :canFavorite="!!currentUser"
           @select="selectedId = $event"
           @toggle-compare="toggleCompare"
+          @toggle-favorite="toggleFavorite"
         />
       </main>
       </div>
@@ -416,6 +509,9 @@ body {
 .btn-add:hover { background: #7a1f32; }
 .btn-admin { background: none; color: rgba(255,255,255,0.8); border: none; font-size: 0.95rem; padding: 0.25rem 0.5rem; }
 .btn-admin:hover { color: white; background: none; }
+.btn-fav { background: none; color: rgba(255,255,255,0.8); border: none; font-size: 0.95rem; padding: 0.25rem 0.5rem; }
+.btn-fav:hover { color: white; background: none; }
+.btn-fav.active { color: #ffcc00; }
 .btn-login { background: none; color: rgba(255,255,255,0.8); border: none; font-size: 0.95rem; padding: 0.25rem 0.5rem; }
 .btn-login:hover { color: white; background: none; }
 .btn-register { background: none; color: rgba(255,255,255,0.8); border: none; font-size: 0.95rem; padding: 0.25rem 0.5rem; }
@@ -625,6 +721,7 @@ body {
   padding: 0.38rem 0.75rem; font-size: 0.82rem; cursor: pointer; font-family: inherit;
 }
 .btn-compare-clear:hover { background: rgba(0,0,0,0.13); }
+
 
 .main-bg {
   background: #d9d4c7;

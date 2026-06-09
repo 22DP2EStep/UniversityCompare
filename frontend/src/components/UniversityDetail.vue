@@ -319,8 +319,8 @@ watch(() => props.id, load, { immediate: true })
   padding: 2px 8px; border-radius: 10px;
   font-size: 0.75rem; font-weight: 700;
 }
-.rank-lv { background: #fdf0f2; color: #7a1f32; }
-.rank-world { background: #fef3c7; color: #92400e; }
+.rank-lv { background: #a83248; color: #fff; }
+.rank-world { background: #b45309; color: #fff; }
 
 .website-link { font-size: 0.85rem; color: #a83248; text-decoration: none; }
 .website-link:hover { text-decoration: underline; }
@@ -481,10 +481,10 @@ textarea.edit-input { resize: vertical; }
 .btn-primary { background: #a83248; color: white; }
 .btn-primary:hover { background: #7a1f32; }
 .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
-.btn-edit-uni { background: #fdf0f2; color: #a83248; border: 1px solid #f8d4d8; font-size: 0.82rem; }
-.btn-edit-uni:hover { background: #f8d4d8; }
-.btn-add-prog { background: #fdf0f2; color: #a83248; border: 1px solid #f8d4d8; font-size: 0.8rem; padding: 0.3rem 0.7rem; }
-.btn-add-prog:hover { background: #f8d4d8; }
+.btn-edit-uni { background: #a83248; color: #fff; border: 1px solid #7a1f32; font-size: 0.82rem; }
+.btn-edit-uni:hover { background: #7a1f32; }
+.btn-add-prog { background: #a83248; color: #fff; border: 1px solid #7a1f32; font-size: 0.8rem; padding: 0.3rem 0.7rem; }
+.btn-add-prog:hover { background: #7a1f32; }
 .btn-del-prog {
   background: none;
   border: none;

@@ -113,10 +113,34 @@ async function deleteUni(id, name) {
 
 const users = ref([])
 const usersLoading = ref(false)
-// savingRole satur lietotāja ID kuram pašlaik tiek saglabāta loma
 const savingRole = ref(null)
-// pendingExpertUni glabā katram lietotājam izvēlēto universitāti pirms saglabāšanas
 const pendingExpertUni = ref({})
+const panelRole = ref('')
+const panelExpertUni = ref('')
+
+function selectUser(user) {
+  if (selectedUser.value?.id === user.id) { selectedUser.value = null; return }
+  selectedUser.value = user
+  panelRole.value = user.role
+  panelExpertUni.value = user.expert_university_id ?? ''
+}
+
+async function saveUserPanel() {
+  const user = selectedUser.value
+  savingRole.value = user.id
+  error.value = ''
+  try {
+    const uniId = panelRole.value === 'expert' ? Number(panelExpertUni.value) || null : null
+    const res = await api.admin.users.setRole(user.id, panelRole.value, uniId)
+    user.role = res.role
+    user.expert_university_id = res.expert_university_id ?? null
+    selectedUser.value = null
+  } catch (e) {
+    error.value = e.message
+  } finally {
+    savingRole.value = null
+  }
+}
 
 async function loadUsers() {
   usersLoading.value = true
@@ -191,6 +215,11 @@ function switchTab(t) {
   selectedUser.value = null
   if (t === 'universities') loadUniversities()
   else { loadUsers(); if (!universities.value.length) loadUniversities() }
+}
+
+function selectUni(uni) {
+  if (selectedUni.value?.id === uni.id) { selectedUni.value = null; return }
+  selectedUni.value = uni
 }
 
 function editUniFromPopup() {
@@ -290,6 +319,18 @@ onMounted(() => loadUniversities())
             </form>
           </div>
 
+          <div v-if="selectedUni" class="user-edit-panel">
+            <div class="panel-info">
+              <span class="panel-name">{{ selectedUni.name }}</span>
+              <span class="panel-email">{{ selectedUni.location }}, {{ selectedUni.country }}</span>
+            </div>
+            <div class="panel-actions">
+              <button class="btn btn-edit btn-sm" @click="editUniFromPopup">{{ t('edit') }}</button>
+              <button class="btn btn-danger btn-sm" @click="deleteUniFromPopup">{{ t('delete') }}</button>
+              <button class="btn btn-secondary btn-sm" @click="selectedUni = null">{{ t('cancel') }}</button>
+            </div>
+          </div>
+
           <div v-if="uniLoading" class="loading">{{ t('loading') }}</div>
           <table v-else-if="universities.length" class="data-table">
             <thead>
@@ -299,20 +340,21 @@ onMounted(() => loadUniversities())
                 <th>{{ t('colLocation') }}</th>
                 <th>{{ t('colCountry') }}</th>
                 <th>{{ t('colRanking') }}</th>
-                <th>{{ t('colActions') }}</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="uni in universities" :key="uni.id">
+              <tr
+                v-for="uni in universities"
+                :key="uni.id"
+                class="user-row"
+                :class="{ 'row-selected': selectedUni?.id === uni.id }"
+                @click="selectUni(uni)"
+              >
                 <td class="muted">{{ uni.id }}</td>
                 <td class="bold">{{ uni.name }}</td>
                 <td>{{ uni.location }}</td>
                 <td>{{ uni.country }}</td>
                 <td>{{ uni.ranking ?? '—' }}</td>
-                <td class="actions">
-                  <button class="btn btn-edit" @click="openEditUni(uni)">{{ t('edit') }}</button>
-                  <button class="btn btn-danger btn-sm" @click="deleteUni(uni.id, uni.name)">{{ t('delete') }}</button>
-                </td>
               </tr>
             </tbody>
           </table>
@@ -324,6 +366,29 @@ onMounted(() => loadUniversities())
             <span class="count">{{ users.length }} {{ t('usersCount') }}</span>
           </div>
 
+          <div v-if="selectedUser" class="user-edit-panel">
+            <div class="panel-info">
+              <span class="panel-name">{{ selectedUser.name }}</span>
+              <span class="panel-email">{{ selectedUser.email }}</span>
+            </div>
+            <div class="panel-controls">
+              <select v-model="panelRole" :class="['role-select', `role-${panelRole}`]" :disabled="savingRole === selectedUser.id">
+                <option value="user">{{ t('roleUser') }}</option>
+                <option value="expert">{{ t('roleExpert') }}</option>
+                <option value="admin">{{ t('roleAdmin') }}</option>
+              </select>
+              <select v-if="panelRole === 'expert'" v-model="panelExpertUni" class="uni-select" :disabled="savingRole === selectedUser.id">
+                <option value="">{{ t('selectUni') }}</option>
+                <option v-for="u in universities" :key="u.id" :value="u.id">{{ u.name }}</option>
+              </select>
+            </div>
+            <div class="panel-actions">
+              <button class="btn btn-edit btn-sm" :disabled="savingRole === selectedUser.id" @click="saveUserPanel">{{ t('save') }}</button>
+              <button class="btn btn-danger btn-sm" :disabled="savingRole === selectedUser.id" @click="deleteUserFromPopup">{{ t('delete') }}</button>
+              <button class="btn btn-secondary btn-sm" @click="selectedUser = null">{{ t('cancel') }}</button>
+            </div>
+          </div>
+
           <div v-if="usersLoading" class="loading">{{ t('loading') }}</div>
           <table v-else-if="users.length" class="data-table">
             <thead>
@@ -332,44 +397,22 @@ onMounted(() => loadUniversities())
                 <th>{{ t('colName') }}</th>
                 <th>{{ t('emailLabel') }}</th>
                 <th>{{ t('colRole') }}</th>
-                <th>{{ t('colExpertUni') }}</th>
                 <th>{{ t('colRegistered') }}</th>
-                <th>{{ t('colActions') }}</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in users" :key="user.id">
+              <tr
+                v-for="user in users"
+                :key="user.id"
+                class="user-row"
+                :class="{ 'row-selected': selectedUser?.id === user.id }"
+                @click="selectUser(user)"
+              >
                 <td class="muted">{{ user.id }}</td>
                 <td class="bold">{{ user.name }}</td>
                 <td>{{ user.email }}</td>
-                <td>
-                  <select
-                    :value="user.role"
-                    @change="changeRole(user, $event.target.value)"
-                    :disabled="savingRole === user.id"
-                    :class="['role-select', `role-${user.role}`]"
-                  >
-                    <option value="user">{{ t('roleUser') }}</option>
-                    <option value="expert">{{ t('roleExpert') }}</option>
-                    <option value="admin">{{ t('roleAdmin') }}</option>
-                  </select>
-                </td>
-                <td>
-                  <div v-if="user.role === 'expert'" class="expert-assign">
-                    <select v-model="pendingExpertUni[user.id]" class="uni-select" :disabled="savingRole === user.id">
-                      <option value="">{{ t('selectUni') }}</option>
-                      <option v-for="u in universities" :key="u.id" :value="u.id">{{ u.name }}</option>
-                    </select>
-                    <button class="btn btn-edit btn-sm" :disabled="savingRole === user.id" @click="assignExpert(user)">
-                      {{ t('save') }}
-                    </button>
-                  </div>
-                  <span v-else class="muted">—</span>
-                </td>
+                <td><span :class="['role-chip', `role-${user.role}`]">{{ user.role === 'user' ? t('roleUser') : user.role === 'expert' ? t('roleExpert') : t('roleAdmin') }}</span></td>
                 <td class="muted">{{ new Date(user.created_at).toLocaleDateString('lv-LV') }}</td>
-                <td class="actions">
-                  <button class="btn btn-danger btn-sm" @click="deleteUser(user.id, user.name)">{{ t('delete') }}</button>
-                </td>
               </tr>
             </tbody>
           </table>
@@ -575,12 +618,10 @@ onMounted(() => loadUniversities())
   padding: 0.65rem 0.9rem;
   border-top: 1px solid #ede9e2;
   vertical-align: middle;
-  background: #f5f4f0;
 }
-.data-table tr:hover td { background: #f9f8f5; }
 .bold { font-weight: 600; }
 .muted { color: #999; font-size: 0.8rem; }
-.actions { display: flex; gap: 0.4rem; white-space: nowrap; }
+.actions { display: flex; gap: 0.4rem; white-space: nowrap; align-items: center; }
 
 .action-popup {
   background: #fdfcfa;
@@ -626,12 +667,41 @@ onMounted(() => loadUniversities())
   font-family: inherit;
   background: #f5f4f0;
 }
-.role-admin { background: #fdf0f2; color: #7a1f32; border-color: #f8d4d8; font-weight: 700; }
+.role-admin { background: #f5f4f0; color: #555; }
 .role-user { background: #f5f4f0; color: #555; }
-.role-expert { background: #fef3c7; color: #92400e; border-color: #fcd34d; font-weight: 700; }
+.role-expert { background: #f5f4f0; color: #555; }
 
 .expert-assign { display: flex; gap: 0.4rem; align-items: center; }
 .uni-select { padding: 0.3rem 0.4rem; border: 1px solid #d4d0c8; border-radius: 5px; font-size: 0.78rem; max-width: 200px; background: #f5f4f0; font-family: inherit; }
+
+.role-chip {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.user-row { cursor: pointer; }
+.user-row.row-selected td { background: #eee9e0; }
+
+.user-edit-panel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: #f5f4f0;
+  border: 1px solid #d4d0c8;
+  border-left: 3px solid #a83248;
+  border-radius: 7px;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1rem;
+}
+.panel-info { display: flex; flex-direction: column; gap: 1px; min-width: 150px; }
+.panel-name { font-weight: 700; font-size: 0.875rem; color: #1a1a1a; }
+.panel-email { font-size: 0.78rem; color: #999; }
+.panel-controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.panel-actions { display: flex; align-items: center; gap: 0.4rem; margin-left: auto; }
 
 .loading, .empty-state { color: #999; padding: 1.5rem 0; font-size: 0.9rem; text-align: center; }
 

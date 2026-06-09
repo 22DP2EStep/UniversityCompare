@@ -547,7 +547,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .btn-logout { background: #a83248; color: white; border: none; font-size: 0.95rem; padding: 0.5rem 1.1rem; }
 .btn-logout:hover { background: #7a1f32; color: white; }
 .user-menu { display: flex; align-items: center; gap: 0.5rem; padding-left: 0.75rem; border-left: 1px solid #2e2e2e; margin-left: 0.25rem; }
-.user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #64748b; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; cursor: pointer; }
+.user-avatar { width: 34px; height: 34px; border-radius: 50%; background: #64748b; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; cursor: pointer; }
 .user-name { font-size: 0.95rem; color: rgba(255,255,255,0.8); font-weight: 500; }
 
 .btn-lang {

@@ -1,7 +1,7 @@
 <script setup>
 // Salīdzināšanas skats — rāda līdz 4 universitātēm blakus tabulas formātā
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { api } from '../api.js'
 import { t, tDegree } from '../i18n.js'
 
@@ -14,6 +14,7 @@ const error = ref('')
 
 // Ielādē visu izvēlēto universitāšu datus vienlaikus ar Promise.all
 onMounted(async () => {
+  document.body.style.overflow = 'hidden'
   try {
     const results = await Promise.all(props.ids.map(id => api.universities.get(id)))
     universities.value = results
@@ -24,11 +25,16 @@ onMounted(async () => {
   }
 })
 
+onUnmounted(() => {
+  document.body.style.overflow = ''
+})
+
 // Formatē mācību maksu ar tūkstošu atdalītāju, atgriež '—' ja nav norādīta
 function formatTuition(val) {
   if (!val) return '—'
   return '$' + Number(val).toLocaleString()
 }
+
 </script>
 
 <template>
@@ -109,11 +115,10 @@ function formatTuition(val) {
   inset: 0;
   background: rgba(0,0,0,0.55);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   z-index: 300;
   padding: 2rem 1rem;
-  overflow-y: auto;
 }
 
 .compare-panel {
@@ -121,6 +126,7 @@ function formatTuition(val) {
   border-radius: 10px;
   width: 100%;
   max-width: 1100px;
+  max-height: calc(100vh - 4rem);
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
@@ -183,9 +189,11 @@ function formatTuition(val) {
 .state-msg.error { color: #b91c1c; }
 
 .compare-body {
-  overflow: auto;
   padding: 1.25rem;
   background: #fdfcfa;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .compare-grid {
@@ -206,17 +214,17 @@ function formatTuition(val) {
 .cell:last-child { border-right: none; }
 
 .uni-header {
-  background: #fdf0f2;
+  background: #a83248;
 }
-.uni-title { font-size: 0.925rem; font-weight: 700; color: #a83248; line-height: 1.3; }
-.uni-sub { font-size: 0.75rem; color: #888; margin-top: 3px; }
+.uni-title { font-size: 0.925rem; font-weight: 700; color: #fff; line-height: 1.3; }
+.uni-sub { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-top: 3px; }
 
 .label-col { background: #f5f4f0; }
 .row-label {
   background: #f5f4f0;
   font-weight: 700;
   font-size: 0.72rem;
-  color: #666;
+  color: #000;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -228,12 +236,12 @@ function formatTuition(val) {
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 700;
-  background: #fdf0f2;
-  color: #a83248;
+  background: #a83248;
+  color: #fff;
 }
-.badge-rank { background: #fef3c7; color: #92400e; }
-.badge-rank-lv { background: #fdf0f2; color: #7a1f32; }
-.badge-degree { background: #fdf0f2; color: #a83248; }
+.badge-rank { background: #b45309; color: #fff; }
+.badge-rank-lv { background: #a83248; color: #fff; }
+.badge-degree { background: #a83248; color: #fff; }
 
 .muted { color: #aaa; font-size: 0.82rem; }
 .desc { color: #555; font-size: 0.82rem; line-height: 1.55; }
@@ -241,13 +249,9 @@ function formatTuition(val) {
 .website-link { color: #a83248; font-size: 0.82rem; text-decoration: none; font-weight: 600; }
 .website-link:hover { text-decoration: underline; }
 
-.programs-cell { display: flex; flex-direction: column; gap: 0.6rem; }
-.program-row {
-  padding: 0.5rem 0.65rem;
-  background: #f5f4f0;
-  border-radius: 6px;
-  border: 1px solid #ede9e2;
-}
-.prog-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; color: #1a1a1a; }
+.programs-cell { display: flex; flex-direction: column; gap: 0.75rem; }
+.program-row { padding: 0 1rem 0.6rem; margin: 0 -1rem; border-bottom: 1px solid #ede9e2; }
+.program-row:last-child { border-bottom: none; padding-bottom: 0; }
+.prog-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.2rem; color: #1a1a1a; }
 .prog-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; font-size: 0.78rem; color: #666; }
 </style>

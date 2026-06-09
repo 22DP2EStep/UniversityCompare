@@ -16,7 +16,9 @@ const UNI_SELECT = `
          u.reitings     AS ranking,
          u.attela_url   AS image_url,
          u.atrasanas_vieta_id  AS location_id,
-         u.izveidots    AS created_at
+         u.izveidots    AS created_at,
+         (SELECT COUNT(*) FROM programmas p WHERE p.uni_id = u.id) AS program_count,
+         (SELECT CAST(ROUND(AVG(p.maksa_gada)) AS INTEGER) FROM programmas p WHERE p.uni_id = u.id AND p.maksa_gada IS NOT NULL) AS avg_tuition
   FROM universitates u
   JOIN atrasanas_vieta a ON u.atrasanas_vieta_id = a.id
 `;

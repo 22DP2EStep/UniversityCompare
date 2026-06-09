@@ -98,6 +98,16 @@ const translations = {
     removeCompare: 'Noņemt no salīdzinājuma',
     addCompare: 'Pievienot salīdzinājumam',
     viewDetails: 'Skatīt detaļas',
+    addFavorite: 'Pievienot izlasei',
+    removeFavorite: 'Noņemt no izlases',
+
+    // List toolbar
+    sort: 'Kārtot',
+    sortBy: 'Kārtot:',
+    sortRanking: 'Reitings',
+    sortName: 'Nosaukums (A–Z)',
+    sortPrograms: 'Programmu skaits',
+    showFavorites: 'Izlase',
 
     // UniversityDetail
     editUniversity: 'Rediģēt universitāti',
@@ -295,6 +305,16 @@ const translations = {
     removeCompare: 'Remove from comparison',
     addCompare: 'Add to comparison',
     viewDetails: 'View details',
+    addFavorite: 'Add to favourites',
+    removeFavorite: 'Remove from favourites',
+
+    // List toolbar
+    sort: 'Sort',
+    sortBy: 'Sort:',
+    sortRanking: 'Ranking',
+    sortName: 'Name (A–Z)',
+    sortPrograms: 'Program count',
+    showFavorites: 'Favourites',
 
     // UniversityDetail
     editUniversity: 'Edit university',

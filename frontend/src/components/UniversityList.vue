@@ -7,10 +7,11 @@ const props = defineProps({
   universities: Array,
   selectedId: Number,
   compareIds: { type: Array, default: () => [] },
-  // canCompare ir false nepieteikušiem lietotājiem — salīdzināšana prasa kontu
   canCompare: { type: Boolean, default: false },
+  favoriteIds: { type: Array, default: () => [] },
+  canFavorite: { type: Boolean, default: false },
 })
-const emit = defineEmits(['select', 'toggle-compare'])
+const emit = defineEmits(['select', 'toggle-compare', 'toggle-favorite'])
 
 // Krāsu palette universitātes baneru foniem kad nav attēla URL
 const COLORS = [
@@ -51,6 +52,21 @@ function initials(name) {
           <div v-else class="card-banner-initials">{{ initials(uni.name) }}</div>
 
           <button
+            v-if="canFavorite"
+            class="fav-btn"
+            :class="{ active: favoriteIds.includes(uni.id) }"
+            :title="favoriteIds.includes(uni.id) ? t('removeFavorite') : t('addFavorite')"
+            @click.stop="emit('toggle-favorite', uni.id)"
+          >
+            <svg v-if="favoriteIds.includes(uni.id)" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </button>
+
+          <button
             v-if="canCompare"
             class="compare-btn"
             :class="{ active: compareIds.includes(uni.id) }"
@@ -80,6 +96,9 @@ function initials(name) {
           <div class="card-tags">
             <span v-if="uni.ranking" class="tag tag-rank-lv">
               #{{ uni.ranking }} {{ t('inLatvia') }}
+            </span>
+            <span v-if="canFavorite && uni.avg_tuition" class="tag tag-tuition">
+              ≈€{{ Number(uni.avg_tuition).toLocaleString() }}/{{ t('yearAbbr') }}
             </span>
           </div>
 
@@ -184,8 +203,8 @@ function initials(name) {
 
 .card-tags {
   display: flex;
-  gap: 0.35rem;
   flex-wrap: wrap;
+  gap: 0.35rem;
   min-height: 20px;
 }
 .tag {
@@ -197,8 +216,9 @@ function initials(name) {
   font-size: 0.7rem;
   font-weight: 700;
 }
-.tag-rank-lv { background: #fdf0f2; color: #7a1f32; }
-.tag-rank-world { background: #fef3c7; color: #92400e; }
+.tag-rank-lv { background: #a83248; color: #fff; }
+.tag-rank-world { background: #b45309; color: #fff; }
+.tag-tuition { background: #166534; color: #fff; }
 
 .card-cta {
   display: flex;
@@ -220,6 +240,33 @@ function initials(name) {
   transition: color 0.15s;
 }
 .card:hover .card-cta { color: #7a1f32; }
+
+.fav-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: none;
+  background: rgba(255,255,255,0.92);
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.fav-btn:hover {
+  background: #fffbeb;
+  color: #ffcc00;
+}
+.fav-btn.active {
+  background: #fffbeb;
+  color: #ffcc00;
+}
 
 .compare-btn {
   position: absolute;
