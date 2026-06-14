@@ -242,11 +242,11 @@ watch(() => props.id, load, { immediate: true })
         </thead>
         <tbody>
           <tr v-for="p in university.programs" :key="p.id">
-            <td>{{ p.name }}</td>
-            <td>{{ tDegree(p.degree) }}</td>
-            <td>{{ p.duration_years }}{{ t('yearAbbr') }}</td>
-            <td>{{ p.tuition_per_year ? `€${p.tuition_per_year.toLocaleString()}` : '—' }}</td>
-            <td>{{ p.language }}</td>
+            <td :data-label="t('colName')">{{ p.name }}</td>
+            <td :data-label="t('colDegree')">{{ tDegree(p.degree) }}</td>
+            <td :data-label="t('colDuration')">{{ p.duration_years }}{{ t('yearAbbr') }}</td>
+            <td :data-label="t('colFee')">{{ p.tuition_per_year ? `€${p.tuition_per_year.toLocaleString()}` : '—' }}</td>
+            <td :data-label="t('colLanguage')">{{ p.language }}</td>
             <td v-if="canEdit">
               <button class="btn-del-prog" @click="deleteProgram(p.id)" :title="t('delete')">&#10005;</button>
             </td>
@@ -496,4 +496,65 @@ textarea.edit-input { resize: vertical; }
   transition: color 0.15s, background 0.15s;
 }
 .btn-del-prog:hover { color: #b91c1c; background: #fef2f2; }
+
+@media (max-width: 640px) {
+  /* Header stacks vertically */
+  .detail-header {
+    flex-direction: column;
+    padding: 1.1rem 1rem 0;
+    gap: 0.75rem;
+  }
+  .header-actions {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Reduce side padding throughout */
+  .description { padding: 0 1rem; }
+  .programs-section { padding: 0 1rem; }
+  .map-section { padding: 0 1rem 1.5rem; }
+  .edit-section { margin: 1rem 1rem 0; }
+  .inline-error.mx { margin: 0 1rem 1rem; }
+
+  /* Edit forms: single column */
+  .edit-grid { grid-template-columns: 1fr; }
+  .span2 { grid-column: span 1; }
+  .prog-form-grid { grid-template-columns: 1fr; }
+
+  /* Programs table → cards */
+  .programs-table thead { display: none; }
+  .programs-table,
+  .programs-table tbody,
+  .programs-table tr,
+  .programs-table td { display: block; width: 100%; }
+
+  .programs-table tr {
+    background: white;
+    border: 1px solid #d4d0c8;
+    border-radius: 8px;
+    margin-bottom: 0.65rem;
+    padding: 0.75rem 0.9rem;
+  }
+  .programs-table td {
+    border: none;
+    padding: 0.28rem 0;
+    font-size: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .programs-table td::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    flex-shrink: 0;
+  }
+  .programs-table td:last-child { justify-content: flex-end; }
+  .programs-table tr:hover td { background: transparent; }
+}
 </style>

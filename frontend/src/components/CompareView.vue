@@ -254,4 +254,45 @@ function formatTuition(val) {
 .program-row:last-child { border-bottom: none; padding-bottom: 0; }
 .prog-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.2rem; color: #1a1a1a; }
 .prog-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; font-size: 0.78rem; color: #666; }
+
+@media (max-width: 640px) {
+  .compare-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .compare-panel {
+    border-radius: 16px 16px 0 0;
+    max-width: 100%;
+    max-height: 92vh;
+  }
+  .compare-header {
+    padding: 0.85rem 1rem;
+  }
+  .compare-body {
+    padding: 0.75rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .compare-grid {
+    min-width: 480px;
+    border-radius: 6px;
+  }
+  .label-col,
+  .row-label {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 90px;
+    max-width: 110px;
+    font-size: 0.65rem;
+  }
+  .cell {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.82rem;
+  }
+  .uni-title { font-size: 0.82rem; }
+  .uni-sub { font-size: 0.68rem; }
+  .prog-name { font-size: 0.8rem; }
+  .prog-meta { font-size: 0.72rem; }
+}
 </style>

@@ -41,6 +41,7 @@ const showCompare = ref(false)
 const sortBy = ref('ranking')
 const favorites = ref(new Set())
 const showFavoritesOnly = ref(false)
+const menuOpen = ref(false)
 
 const favoriteIds = computed(() => [...favorites.value])
 
@@ -301,7 +302,42 @@ const activeFilterCount = computed(() =>
             <button class="btn btn-register" @click="goToAuth('register')">{{ t('register') }}</button>
           </template>
         </nav>
+
+        <button class="burger-btn" :class="{ open: menuOpen }" @click="menuOpen = !menuOpen" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </header>
+
+      <div v-show="menuOpen" class="mobile-nav-backdrop" @click="menuOpen = false"></div>
+      <nav v-show="menuOpen" class="mobile-nav">
+        <button class="btn btn-back-home mob-item" @click="currentPage = 'landing'; menuOpen = false">{{ t('backHome') }}</button>
+        <button class="btn-lang mob-item mob-lang" @click="toggleLang">
+          <span :class="{ 'lang-active': lang === 'lv' }">LV</span>
+          <span class="lang-sep">|</span>
+          <span :class="{ 'lang-active': lang === 'en' }">EN</span>
+        </button>
+        <template v-if="currentUser">
+          <button v-if="currentUser.role === 'admin'" class="btn btn-admin mob-item" @click="currentPage = 'admin'; menuOpen = false">{{ t('adminBtn') }}</button>
+          <button class="btn btn-fav mob-item" :class="{ active: showFavoritesOnly }" @click="showFavoritesOnly = !showFavoritesOnly; menuOpen = false">
+            {{ t('showFavorites') }}<template v-if="favorites.size"> ({{ favorites.size }})</template>
+          </button>
+          <button class="mob-item mob-user-btn" @click="currentPage = 'profile'; menuOpen = false">
+            <div class="user-avatar">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v1h16v-1c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </div>
+            <span class="user-name">{{ currentUser.name }}</span>
+          </button>
+          <button class="btn btn-logout mob-item" @click="handleLogout(); menuOpen = false">{{ t('logout') }}</button>
+        </template>
+        <template v-else>
+          <button class="btn btn-login mob-item" @click="goToAuth('login'); menuOpen = false">{{ t('login') }}</button>
+          <button class="btn btn-register mob-item" @click="goToAuth('register'); menuOpen = false">{{ t('register') }}</button>
+        </template>
+      </nav>
 
       <div class="hero">
         <h2 class="hero-title">{{ t('heroTitle') }}</h2>
@@ -774,5 +810,110 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* ── Burger button (hidden on desktop) ── */
+.burger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.burger-btn span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 2px;
+  transition: transform 0.25s, opacity 0.2s;
+  transform-origin: center;
+}
+.burger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.burger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Mobile nav backdrop + panel ── */
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 58px 0 0 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 48;
+}
+.mobile-nav {
+  position: fixed;
+  top: 58px;
+  left: 0;
+  right: 0;
+  background: #0f172a;
+  border-bottom: 2px solid #a83248;
+  z-index: 49;
+  padding: 0.6rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.mob-item {
+  width: 100% !important;
+  text-align: left !important;
+  padding: 0.8rem 0.65rem !important;
+  font-size: 1rem !important;
+  border-radius: 6px;
+  display: block;
+}
+.mob-lang {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #2e2e2e !important;
+}
+.mob-user-btn {
+  display: flex !important;
+  align-items: center;
+  gap: 0.65rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── Mobile breakpoint ── */
+@media (max-width: 768px) {
+  .header-nav { display: none !important; }
+  .burger-btn { display: flex; }
+  .app-header { padding: 0 1.1rem; }
+  .hero { padding: 2.5rem 1.1rem 2rem; }
+  .hero-title { font-size: 1.5rem; }
+  .hero-sub { font-size: 0.9rem; }
+  .hero-search-row { flex-wrap: wrap; }
+  .main-content { padding: 1.25rem; }
+  .compare-bar { padding: 0.6rem 1.1rem; }
+  .app-footer { flex-direction: column; gap: 0.3rem; text-align: center; padding: 0.85rem 1.1rem; }
+}
+
+/* ── Force hide mobile elements on desktop ── */
+@media (min-width: 769px) {
+  .mobile-nav,
+  .mobile-nav-backdrop { display: none !important; }
+}
+
+/* ── Detail modal full-screen on mobile ── */
+@media (max-width: 640px) {
+  .detail-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .detail-modal {
+    border-radius: 16px 16px 0 0;
+    max-width: 100%;
+    min-height: unset;
+    max-height: 92vh;
+  }
 }
 </style>
